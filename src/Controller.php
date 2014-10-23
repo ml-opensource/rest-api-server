@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Contracts\ArrayableInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -25,7 +25,6 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
  */
 class Controller extends BaseController
 {
-
 	/**
 	 * Parameter name for pagination controller: items per page.
 	 * @var string
