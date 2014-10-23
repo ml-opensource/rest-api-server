@@ -15,7 +15,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"Fuzz\\ApiServer": "src/"
+			"Fuzz\\ApiServer\\": "src/"
 		}
 	},
 	"minimum-stability": "dev"
