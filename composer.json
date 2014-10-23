@@ -1,0 +1,22 @@
+{
+	"name": "fuzz/api-server",
+	"description": "",
+	"authors": [
+		{
+			"name": "Fuzz Productions",
+			"email": "fuzzweb@fuzzproductions.com"
+		}
+	],
+	"require": {
+		"php": ">=5.4.0",
+		"illuminate/support": "5.0.*",
+		"illuminate/routing": "5.0.*",
+		"symfony/http-kernel": "2.6.*"
+	},
+	"autoload": {
+		"psr-4": {
+			"Fuzz\\ApiServer": "src/"
+		}
+	},
+	"minimum-stability": "dev"
+}
