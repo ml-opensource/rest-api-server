@@ -7,6 +7,7 @@
 
 namespace Fuzz\ApiServer;
 
+use Monolog\Logger;
 use Illuminate\Support\Facades\App;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Input;
@@ -50,6 +51,12 @@ class Controller extends BaseController
 	const CACHE_TIME = 600;
 
 	/**
+	 * Logger instance.
+	 * @var Monolog\Logger
+	 */
+	private $logger;
+
+	/**
 	 * Class constructor.
 	 * Register exception handlers for handling all exceptions within the app RESTfully.
 	 *
@@ -61,32 +68,59 @@ class Controller extends BaseController
 		App::error(function (\Exception $exception) {
 			return $this->fail($exception);
 		});
+
+		$this->logger = new Logger('API');
 	}
 
 	/**
-	 * Return a JSON response to the caller.
+	 * Success!
 	 *
 	 * @param mixed $data
 	 * @param int   $status_code
-	 * @param array $headers
-	 * @param array $context
+	 * @param array $extra
+	 * @param array $extra_headers
 	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	final private function respond($data, $status_code, $headers = array(), $context = array())
+	public function succeed($data, $status_code = 200, $headers = array(), $context = array())
 	{
-		return Response::json(
-			array_merge(compact('data'), $context),
+		// Handle paginated data differently
+		if ($data instanceof Paginator) {
+			// Add our per_page pagination parameter to the constructed URLs
+			$data->addQuery(static::PAGINATION_PER_PAGE, $this->getPerPage());
+
+			$current_page = $data->getCurrentPage();
+			$last_page    = (int) $data->getLastPage();
+
+			// Prepare useful pagination metadata
+			$pagination = array(
+				'page'     => $current_page,
+				'total'    => $data->getTotal(),
+				'per_page' => $data->getPerPage(),
+				'next'     => $current_page < $last_page ? $data->getUrl($current_page + 1) : null,
+				'previous' => $current_page > 1 ? $data->getUrl($current_page - 1) : null,
+			);
+
+			return $this->respond(
+				$data->getCollection()->toArray(),
+				$status_code,
+				$headers,
+				array_merge($context, compact('pagination'))
+			);
+		} elseif ($data instanceof Arrayable) {
+			return $this->respond(
+				$data->toArray(),
+				$status_code,
+				$headers,
+				$context
+			);
+		}
+
+		return $this->respond(
+			$data,
 			$status_code,
-			array_merge(
-				array(
-					'Cache-Control' =>
-						($status_code === 200 && Request::method() === 'GET')
-						? 'public, max-age=' .  static::CACHE_TIME
-						: 'private, max-age=0'
-				),
-				$headers
-			)
+			$headers,
+			$context
 		);
 	}
 
@@ -103,26 +137,37 @@ class Controller extends BaseController
 		 * Handle known HTTP exceptions RESTfully.
 		 */
 		if ($exception instanceof HttpException) {
+			$error = ($exception->getMessage() ?: $this->getGenericError($exception));
+
+			$this->logger->addWarning($error, compact('exception'));
+
 			return $this->respond(
 				null,
 				$exception->getStatusCode(),
 				$exception->getHeaders(),
-				array('error' => ($exception->getMessage() ?: $this->getGenericError($exception)))
+				compact('error')
 			);
 		}
 
 		/**
 		 * Handle all other errors generically.
 		 */
+
+		/**
+		 * Log an emergency.
+		 */
+		$this->logger->addEmergency($exception->getMessage(), compact('exception'));
+
+		/**
+		 * Contextualize response with verbose information outside production.
+		 *
+		 * Report only "unknown" errors in production.
+		 */
 		return $this->respond(
 			Config::get('app.debug') ? $exception->getMessage() : 'E_UNKNOWN',
 			SymfonyResponse::HTTP_INTERNAL_SERVER_ERROR
 		);
 	}
-
-	/****************************************
-	 * Subclass-accessible response methods *
-	 ****************************************/
 
 	/**
 	 * Object not found.
@@ -185,55 +230,39 @@ class Controller extends BaseController
 	}
 
 	/**
-	 * Success!
+	 * Return a JSON response to the caller.
 	 *
 	 * @param mixed $data
 	 * @param int   $status_code
-	 * @param array $extra
-	 * @param array $extra_headers
+	 * @param array $headers
+	 * @param array $context
 	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function succeed($data, $status_code = 200, $headers = array(), $context = array())
+	final private function respond($data, $status_code, $headers = array(), $context = array())
 	{
-		// Handle paginated data differently
-		if ($data instanceof Paginator) {
-			// Add our per_page pagination parameter to the constructed URLs
-			$data->addQuery(static::PAGINATION_PER_PAGE, $this->getPerPage());
-
-			$current_page = $data->getCurrentPage();
-			$last_page    = (int) $data->getLastPage();
-
-			// Prepare useful pagination metadata
-			$pagination = array(
-				'page'     => $current_page,
-				'total'    => $data->getTotal(),
-				'per_page' => $data->getPerPage(),
-				'next'     => $current_page < $last_page ? $data->getUrl($current_page + 1) : null,
-				'previous' => $current_page > 1 ? $data->getUrl($current_page - 1) : null,
-			);
-
-			return $this->respond(
-				$data->getCollection()->toArray(),
-				$status_code,
-				$headers,
-				array_merge($context, compact('pagination'))
-			);
-		} elseif ($data instanceof Arrayable) {
-			return $this->respond(
-				$data->toArray(),
-				$status_code,
-				$headers,
-				$context
-			);
-		}
-
-		return $this->respond(
-			$data,
+		return Response::json(
+			array_merge(compact('data'), $context),
 			$status_code,
-			$headers,
-			$context
+			array_merge(
+				array(
+					'Cache-Control' =>
+						($status_code === 200 && Request::method() === 'GET')
+						? 'public, max-age=' .  static::CACHE_TIME
+						: 'private, max-age=0'
+				),
+				$headers
+			)
 		);
+	}
+
+	/**
+	 * Retrieve the logger.
+	 * @return Monolog\Logger
+	 */
+	public function getLogger()
+	{
+		return $this->logger;
 	}
 
 	/**
