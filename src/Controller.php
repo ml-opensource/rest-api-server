@@ -7,18 +7,18 @@
 
 namespace Fuzz\ApiServer;
 
-use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\App;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Response;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Contracts\ArrayableInterface;
+use Illuminate\Routing\Controller as BaseController;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
  * API Base Controller class.
@@ -29,7 +29,7 @@ class Controller extends BaseController
 	 * Parameter name for pagination controller: items per page.
 	 * @var string
 	 */
-	const PAGINATION_PER_PAGE         = 'per_page';
+	const PAGINATION_PER_PAGE = 'per_page';
 
 	/**
 	 * Default items per page.
@@ -41,13 +41,13 @@ class Controller extends BaseController
 	 * The API version string for an implementation of this controller.
 	 * @var string
 	 */
-	const VERSION                     = false;
+	const API_VERSION = false;
 
 	/**
 	 * Default cache time for cachable responses.
 	 * @var int
 	 */
-	const CACHE_TIME                  = 600;
+	const CACHE_TIME = 600;
 
 	/**
 	 * Class constructor.
@@ -57,7 +57,7 @@ class Controller extends BaseController
 	 */
 	public function __construct()
 	{
-		// Catch all other kinds of errors and notify the caller RESTfully
+		// Catch all errors and notify the caller RESTfully
 		App::error(function (\Exception $exception) {
 			return $this->fail($exception);
 		});
@@ -104,9 +104,10 @@ class Controller extends BaseController
 		 */
 		if ($exception instanceof HttpException) {
 			return $this->respond(
-				$exception->getMessage(),
+				null,
 				$exception->getStatusCode(),
-				$exception->getHeaders()
+				$exception->getHeaders(),
+				array('error' => ($exception->getMessage() ?: $this->getGenericError($exception)))
 			);
 		}
 
@@ -130,9 +131,9 @@ class Controller extends BaseController
 	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function notFound($data)
+	public function notFound($error)
 	{
-		return $this->respond($data, 404);
+		return $this->respond(null, 404, [], compact('error'));
 	}
 
 	/**
@@ -142,9 +143,9 @@ class Controller extends BaseController
 	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function accessDenied($data)
+	public function accessDenied($error)
 	{
-		return $this->respond($data, 403);
+		return $this->respond(null, 403, [], compact('error'));
 	}
 
 	/**
@@ -154,9 +155,9 @@ class Controller extends BaseController
 	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function unauthorized($data)
+	public function unauthorized($error)
 	{
-		return $this->respond($data, 401);
+		return $this->respond(null, 401, [], compact('error'));
 	}
 
 	/**
@@ -166,9 +167,9 @@ class Controller extends BaseController
 	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function badRequest($data)
+	public function badRequest($error)
 	{
-		return $this->respond($data, 400);
+		return $this->respond(null, 400, [], compact('error'));
 	}
 
 	/**
@@ -245,7 +246,7 @@ class Controller extends BaseController
 	 */
 	public function missingMethod($parameters = array())
 	{
-		if (! static::VERSION) {
+		if (! static::API_VERSION) {
 			return $this->badRequest('E_INVALID_API_VERSION');
 		}
 
@@ -279,43 +280,29 @@ class Controller extends BaseController
 	}
 
 	/**
-	 * Passes requests routed to this controller's route stem down to missingMethod.
-	 *
-	 * @return \Illuminate\Http\JsonResponse
+	 * Resolve an exception to a generic error.
 	 */
-	public function getIndex()
+	final private function getGenericError(\Exception $exception)
 	{
-		return $this->missingMethod();
-	}
+		switch (get_class($exception)) {
+			case 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException':
+				return 'E_NOT_FOUND';
+				break;
+			case 'Symfony\Component\HttpKernel\Exception\BadRequestHttpException':
+				return 'E_BAD_REQUEST';
+				break;
+			case 'Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException':
+				return 'E_ACCESS_DENIED';
+				break;
+			case 'Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException':
+				return 'E_UNAUTHORIZED';
+				break;
+			case 'Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException':
+				return 'E_METHOD_NOT_ALLOWED';
+				break;
+		}
 
-	/**
-	 * Passes requests routed to this controller's route stem down to missingMethod.
-	 *
-	 * @return \Illuminate\Http\JsonResponse
-	 */
-	public function postIndex()
-	{
-		return $this->missingMethod();
-	}
-
-	/**
-	 * Passes requests routed to this controller's route stem down to missingMethod.
-	 *
-	 * @return \Illuminate\Http\JsonResponse
-	 */
-	public function putIndex()
-	{
-		return $this->missingMethod();
-	}
-
-	/**
-	 * Passes requests routed to this controller's route stem down to missingMethod.
-	 *
-	 * @return \Illuminate\Http\JsonResponse
-	 */
-	public function deleteIndex()
-	{
-		return $this->missingMethod();
+		return 'E_UNKNOWN';
 	}
 
 	/**
