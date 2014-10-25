@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Fuzz\ApiServer\Exception\HttpException;
 use Fuzz\ApiServer\Exception\NotFoundException;
 use Fuzz\ApiServer\Exception\BadRequestException;
@@ -82,6 +83,18 @@ class Controller extends BaseController
 		// Catch all errors and notify the caller RESTfully
 		App::error(function (\Exception $exception) {
 			return $this->fail($exception);
+		});
+
+		// Handle ModelNotFoundExceptions RESTfully
+		App::error(function (ModelNotFoundException $exception) {
+			return $this->fail(
+				new NotFoundException(
+					[
+						'model' => $exception->getModel(),
+					],
+					'E_MODEL_NOT_FOUND'
+				)
+			);
 		});
 
 		$this->logger = new Logger('API');
