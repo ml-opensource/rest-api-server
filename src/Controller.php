@@ -8,6 +8,7 @@
 namespace Fuzz\ApiServer;
 
 use Monolog\Logger;
+use Monolog\Handler\AbstractProcessingHandler;
 use Illuminate\Support\Facades\App;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Input;
@@ -19,6 +20,7 @@ use Illuminate\Support\Contracts\ArrayableInterface;
 use Illuminate\Routing\Controller as BaseController;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 /**
@@ -52,7 +54,7 @@ class Controller extends BaseController
 
 	/**
 	 * Logger instance.
-	 * @var Monolog\Logger
+	 * @var \Monolog\Logger
 	 */
 	private $logger;
 
@@ -70,6 +72,16 @@ class Controller extends BaseController
 		});
 
 		$this->logger = new Logger('API');
+	}
+
+	/**
+	 * Add a log handler.
+	 * @param \Monolog\Handler\AbstractProcessingHandler $handler
+	 * @return void
+	 */
+	public function addLogHandler(AbstractProcessingHandler $handler)
+	{
+		$this->logger->pushHandler($handler);
 	}
 
 	/**
@@ -107,7 +119,7 @@ class Controller extends BaseController
 				$headers,
 				array_merge($context, compact('pagination'))
 			);
-		} elseif ($data instanceof Arrayable) {
+		} elseif ($data instanceof ArrayableInterface) {
 			return $this->respond(
 				$data->toArray(),
 				$status_code,
@@ -128,7 +140,6 @@ class Controller extends BaseController
 	 * Notify the caller of failure.
 	 *
 	 * @param \Exception $exception
-	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	final private function fail(\Exception $exception)
@@ -173,7 +184,6 @@ class Controller extends BaseController
 	 * Object not found.
 	 *
 	 * @param mixed $data
-	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function notFound($error)
@@ -185,7 +195,6 @@ class Controller extends BaseController
 	 * Access denied.
 	 *
 	 * @param mixed $data
-	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function accessDenied($error)
@@ -197,7 +206,6 @@ class Controller extends BaseController
 	 * Unauthorized.
 	 *
 	 * @param mixed $data
-	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function unauthorized($error)
@@ -209,7 +217,6 @@ class Controller extends BaseController
 	 * Bad request.
 	 *
 	 * @param mixed $data
-	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function badRequest($error)
@@ -221,7 +228,6 @@ class Controller extends BaseController
 	 * Inform caller about available methods.
 	 *
 	 * @param array $valid_methods
-	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function expectMethods(array $valid_methods)
@@ -236,7 +242,6 @@ class Controller extends BaseController
 	 * @param int   $status_code
 	 * @param array $headers
 	 * @param array $context
-	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	final private function respond($data, $status_code, $headers = array(), $context = array())
@@ -257,20 +262,10 @@ class Controller extends BaseController
 	}
 
 	/**
-	 * Retrieve the logger.
-	 * @return Monolog\Logger
-	 */
-	public function getLogger()
-	{
-		return $this->logger;
-	}
-
-	/**
 	 * API calls without a routed string will resolve to the base controller.
 	 * This method catches all of them and notifies the caller of failure.
 	 *
 	 * @param array $parameters
-	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function missingMethod($parameters = array())
@@ -310,6 +305,8 @@ class Controller extends BaseController
 
 	/**
 	 * Resolve an exception to a generic error.
+	 * @param \Exception $exception
+	 * @return string
 	 */
 	final private function getGenericError(\Exception $exception)
 	{
@@ -348,7 +345,7 @@ class Controller extends BaseController
 	 * Require a set of parameters.
 	 *
 	 * @return array
-	 * @throws BadRequestException
+	 * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
 	 */
 	protected function requireParameters()
 	{
@@ -364,7 +361,7 @@ class Controller extends BaseController
 		}
 
 		if (count($missing_required) !== 0) {
-			throw new BadRequestException(
+			throw new BadRequestHttpException(
 				sprintf('Missing required parmeters: %s.', implode(', ', $missing_required))
 			);
 		}
