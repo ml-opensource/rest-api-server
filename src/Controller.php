@@ -114,7 +114,10 @@ class Controller extends BaseController
 		// Handle paginated data differently
 		if ($data instanceof Paginator) {
 			// Pass in any additional query variables
-			foreach (array_except(Request::instance()->query->all(), array(self::PAGINATION_CURRENT_PAGE, self::PAGINATION_PER_PAGE)) as $key => $value) {
+			foreach (array_except(
+				Request::instance()->query->all(),
+				array(self::PAGINATION_CURRENT_PAGE, self::PAGINATION_PER_PAGE)
+			) as $key => $value) {
 				$data->addQuery($key, $value);
 			}
 
