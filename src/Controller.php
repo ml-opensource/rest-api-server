@@ -174,9 +174,13 @@ class Controller extends BaseController
 		 *
 		 * Report only "unknown" errors in production.
 		 */
+		$error = Config::get('app.debug') ? $exception->getMessage() : 'E_UNKNOWN';
+
 		return $this->respond(
-			Config::get('app.debug') ? $exception->getMessage() : 'E_UNKNOWN',
-			SymfonyResponse::HTTP_INTERNAL_SERVER_ERROR
+			null,
+			SymfonyResponse::HTTP_INTERNAL_SERVER_ERROR,
+			[],
+			compact('error')
 		);
 	}
 
