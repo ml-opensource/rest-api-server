@@ -18,10 +18,11 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Contracts\ArrayableInterface;
 use Illuminate\Routing\Controller as BaseController;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Fuzz\ApiServer\Exception\HttpException;
+use Fuzz\ApiServer\Exception\NotFoundException;
+use Fuzz\ApiServer\Exception\BadRequestException;
+use Fuzz\ApiServer\Exception\UnauthorizedException;
+Use Fuzz\ApiServer\Exception\AccessDeniedException;
 
 /**
  * API Base Controller class.
@@ -116,7 +117,7 @@ class Controller extends BaseController
 			// Pass in any additional query variables
 			foreach (array_except(
 				Request::instance()->query->all(),
-				array(self::PAGINATION_CURRENT_PAGE, self::PAGINATION_PER_PAGE)
+				[self::PAGINATION_CURRENT_PAGE, self::PAGINATION_PER_PAGE]
 			) as $key => $value) {
 				$data->addQuery($key, $value);
 			}
@@ -163,6 +164,7 @@ class Controller extends BaseController
 	 * Notify the caller of failure.
 	 *
 	 * @param \Exception $exception
+	 * @param mixed      $data
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	final private function fail(\Exception $exception)
@@ -171,13 +173,13 @@ class Controller extends BaseController
 		 * Handle known HTTP exceptions RESTfully.
 		 */
 		if ($exception instanceof HttpException) {
-			$error = ($exception->getMessage() ?: $this->getGenericError($exception));
+			$error = $exception->getMessage();
 
 			$this->logger->addWarning($error, compact('exception'));
 
 			return $this->respond(
-				null,
-				$exception->getStatusCode(),
+				$exception->getData(),
+				$exception::STATUS_CODE,
 				$exception->getHeaders(),
 				compact('error')
 			);
@@ -201,7 +203,7 @@ class Controller extends BaseController
 
 		return $this->respond(
 			null,
-			SymfonyResponse::HTTP_INTERNAL_SERVER_ERROR,
+			HttpException::STATUS_CODE,
 			[],
 			compact('error')
 		);
@@ -210,45 +212,49 @@ class Controller extends BaseController
 	/**
 	 * Object not found.
 	 *
+	 * @param string $error
 	 * @param mixed $data
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function notFound($error)
+	public function notFound($error, $data = null)
 	{
-		return $this->respond(null, 404, [], compact('error'));
+		return $this->respond($data, NotFoundException::STATUS_CODE, [], compact('error'));
 	}
 
 	/**
 	 * Access denied.
 	 *
+	 * @param string $error
 	 * @param mixed $data
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function accessDenied($error)
+	public function accessDenied($error, $data = null)
 	{
-		return $this->respond(null, 403, [], compact('error'));
+		return $this->respond($data, AccessDeniedException::STATUS_CODE, [], compact('error'));
 	}
 
 	/**
 	 * Unauthorized.
 	 *
+	 * @param string $error
 	 * @param mixed $data
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function unauthorized($error)
+	public function unauthorized($error, $data= null)
 	{
-		return $this->respond(null, 401, [], compact('error'));
+		return $this->respond($data, UnauthorizedException::STATUS_CODE, [], compact('error'));
 	}
 
 	/**
 	 * Bad request.
 	 *
+	 * @param string $error
 	 * @param mixed $data
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function badRequest($error)
+	public function badRequest($error, $data = null)
 	{
-		return $this->respond(null, 400, [], compact('error'));
+		return $this->respond($data, BadRequestException::STATUS_CODE, [], compact('error'));
 	}
 
 	/**
@@ -257,9 +263,18 @@ class Controller extends BaseController
 	 * @param array $valid_methods
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function expectMethods(array $valid_methods)
+	final private function expectMethods(array $valid_methods)
 	{
-		throw new MethodNotAllowedHttpException($valid_methods);
+		return $this->respond(
+			null,
+			405,
+			[
+				'Allow' => implode(', ', $valid_methods),
+			],
+			[
+				'error' => 'E_METHOD_NOT_ALLOWED',
+			]
+		);
 	}
 
 	/**
@@ -331,34 +346,6 @@ class Controller extends BaseController
 	}
 
 	/**
-	 * Resolve an exception to a generic error.
-	 * @param \Exception $exception
-	 * @return string
-	 */
-	final private function getGenericError(\Exception $exception)
-	{
-		switch (get_class($exception)) {
-			case 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException':
-				return 'E_NOT_FOUND';
-				break;
-			case 'Symfony\Component\HttpKernel\Exception\BadRequestHttpException':
-				return 'E_BAD_REQUEST';
-				break;
-			case 'Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException':
-				return 'E_ACCESS_DENIED';
-				break;
-			case 'Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException':
-				return 'E_UNAUTHORIZED';
-				break;
-			case 'Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException':
-				return 'E_METHOD_NOT_ALLOWED';
-				break;
-		}
-
-		return 'E_UNKNOWN';
-	}
-
-	/**
 	 * Returns the value of the pagination "per page" parameter.
 	 *
 	 * @return int
@@ -372,7 +359,7 @@ class Controller extends BaseController
 	 * Require a set of parameters.
 	 *
 	 * @return array
-	 * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
+	 * @throws BadRequestException
 	 */
 	protected function requireParameters()
 	{
@@ -388,8 +375,9 @@ class Controller extends BaseController
 		}
 
 		if (count($missing_required) !== 0) {
-			throw new BadRequestHttpException(
-				sprintf('Missing required parmeters: %s.', implode(', ', $missing_required))
+			throw new BadRequestException(
+				compact('missing_required'),
+				'E_MISSING_REQUIRED'
 			);
 		}
 
