@@ -72,6 +72,9 @@ class Controller extends BaseController
 		});
 
 		$this->logger = new Logger('API');
+
+		// Make our logger available outside the controller context
+		App::instance('apilogger', $this->logger);
 	}
 
 	/**
