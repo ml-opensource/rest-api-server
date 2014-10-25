@@ -420,10 +420,6 @@ class Controller extends BaseController
 	 */
 	protected function readArrayParameter($parameter_name)
 	{
-		if (Input::isJson()) {
-			return array_filter(array_unique((array) Input::json($parameter_name)));
-		}
-
-		return array_filter(array_unique((array) Input::get($parameter_name)));
+		return array_values(array_filter((array) Input::get($parameter_name)));
 	}
 }
