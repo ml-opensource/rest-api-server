@@ -47,6 +47,12 @@ class Controller extends BaseController
 	const PAGINATION_PER_PAGE_DEFAULT = 10;
 
 	/**
+	 * Maximum items per page.
+	 * @var int
+	 */
+	const PAGINATION_PER_PAGE_MAXIMUM= 50;
+
+	/**
 	 * The API version string for an implementation of this controller.
 	 * @var string
 	 */
@@ -356,7 +362,7 @@ class Controller extends BaseController
 	 */
 	protected function getPerPage($default = self::PAGINATION_PER_PAGE_DEFAULT)
 	{
-		return (int) Input::get(static::PAGINATION_PER_PAGE, $default);
+		return min((int) Input::get(static::PAGINATION_PER_PAGE, $default), self::PAGINATION_PER_PAGE_MAXIMUM);
 	}
 
 	/**
