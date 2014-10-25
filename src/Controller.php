@@ -94,7 +94,7 @@ class Controller extends BaseController
 	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function succeed($data, $status_code = 200, $headers = array(), $context = array())
+	public function succeed($data, $status_code = 200, $headers = [], $context = [])
 	{
 		// Handle paginated data differently
 		if ($data instanceof Paginator) {
@@ -105,13 +105,13 @@ class Controller extends BaseController
 			$last_page    = (int) $data->getLastPage();
 
 			// Prepare useful pagination metadata
-			$pagination = array(
+			$pagination = [
 				'page'     => $current_page,
 				'total'    => $data->getTotal(),
 				'per_page' => $data->getPerPage(),
 				'next'     => $current_page < $last_page ? $data->getUrl($current_page + 1) : null,
 				'previous' => $current_page > 1 ? $data->getUrl($current_page - 1) : null,
-			);
+			];
 
 			return $this->respond(
 				$data->getCollection()->toArray(),
@@ -244,18 +244,18 @@ class Controller extends BaseController
 	 * @param array $context
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	final private function respond($data, $status_code, $headers = array(), $context = array())
+	final private function respond($data, $status_code, $headers = [], $context = [])
 	{
 		return Response::json(
 			array_merge(compact('data'), $context),
 			$status_code,
 			array_merge(
-				array(
+				[
 					'Cache-Control' =>
 						($status_code === 200 && Request::method() === 'GET')
 						? 'public, max-age=' .  static::CACHE_TIME
 						: 'private, max-age=0'
-				),
+				],
 				$headers
 			)
 		);
@@ -268,7 +268,7 @@ class Controller extends BaseController
 	 * @param array $parameters
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function missingMethod($parameters = array())
+	public function missingMethod($parameters = [])
 	{
 		if (! static::API_VERSION) {
 			return $this->badRequest('E_INVALID_API_VERSION');
@@ -278,7 +278,7 @@ class Controller extends BaseController
 		$url_parts = parse_url($_SERVER['REQUEST_URI']);
 		$uri       = $url_parts['path'];
 
-		$valid_methods = array();
+		$valid_methods = [];
 		$request = Request::instance();
 
 		foreach (Route::getRoutes() as $route) {
@@ -349,8 +349,8 @@ class Controller extends BaseController
 	 */
 	protected function requireParameters()
 	{
-		$passed_parameters = array();
-		$missing_required  = array();
+		$passed_parameters = [];
+		$missing_required  = [];
 
 		foreach (func_get_args() as $parameter_name) {
 			if (! Input::has($parameter_name)) {
@@ -376,7 +376,7 @@ class Controller extends BaseController
 	 */
 	protected function suggestParameters()
 	{
-		$passed_parameters = array();
+		$passed_parameters = [];
 
 		foreach (func_get_args() as $parameter_name) {
 			$passed_parameters[] = Input::get($parameter_name, null);
