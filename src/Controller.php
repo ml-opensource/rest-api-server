@@ -35,6 +35,12 @@ class Controller extends BaseController
 	const PAGINATION_PER_PAGE = 'per_page';
 
 	/**
+	 * Parameter name for pagination controller: current page.
+	 * @var string
+	 */
+	const PAGINATION_CURRENT_PAGE = 'page';
+
+	/**
 	 * Default items per page.
 	 * @var int
 	 */
@@ -101,8 +107,13 @@ class Controller extends BaseController
 	{
 		// Handle paginated data differently
 		if ($data instanceof Paginator) {
-			// Add our per_page pagination parameter to the constructed URLs
-			$data->addQuery(static::PAGINATION_PER_PAGE, $this->getPerPage());
+			// Pass in any additional query variables
+			foreach(array_except(Request::instance()->query->all(), array(self::PAGINATION_CURRENT_PAGE, self::PAGINATION_PER_PAGE)) as $key => $value) {
+				$data->addQuery($key, $value);
+			}
+
+			// Add our "per page" pagination parameter to the constructed URLs
+			$data->addQuery(self::PAGINATION_PER_PAGE, $data->getPerPage());
 
 			$current_page = $data->getCurrentPage();
 			$last_page    = (int) $data->getLastPage();
@@ -343,9 +354,9 @@ class Controller extends BaseController
 	 *
 	 * @return int
 	 */
-	protected function getPerPage()
+	protected function getPerPage($default = self::PAGINATION_PER_PAGE_DEFAULT)
 	{
-		return (int) Input::get(static::PAGINATION_PER_PAGE, static::PAGINATION_PER_PAGE_DEFAULT);
+		return (int) Input::get(static::PAGINATION_PER_PAGE, $default);
 	}
 
 	/**
