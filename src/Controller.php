@@ -32,42 +32,49 @@ class Controller extends BaseController
 {
 	/**
 	 * Parameter name for pagination controller: items per page.
+	 *
 	 * @var string
 	 */
 	const PAGINATION_PER_PAGE = 'per_page';
 
 	/**
 	 * Parameter name for pagination controller: current page.
+	 *
 	 * @var string
 	 */
 	const PAGINATION_CURRENT_PAGE = 'page';
 
 	/**
 	 * Default items per page.
+	 *
 	 * @var int
 	 */
 	const PAGINATION_PER_PAGE_DEFAULT = 10;
 
 	/**
 	 * Maximum items per page.
+	 *
 	 * @var int
 	 */
-	const PAGINATION_PER_PAGE_MAXIMUM= 50;
+	const PAGINATION_PER_PAGE_MAXIMUM = 50;
 
 	/**
 	 * The API version string for an implementation of this controller.
+	 *
 	 * @var string
 	 */
 	const API_VERSION = false;
 
 	/**
 	 * Default cache time for cachable responses.
+	 *
 	 * @var int
 	 */
 	const CACHE_TIME = 600;
 
 	/**
 	 * Logger instance.
+	 *
 	 * @var \Monolog\Logger
 	 */
 	private $logger;
@@ -81,21 +88,24 @@ class Controller extends BaseController
 	public function __construct()
 	{
 		// Catch all errors and notify the caller RESTfully
-		App::error(function (\Exception $exception) {
-			return $this->fail($exception);
-		});
+		App::error(
+			function (\Exception $exception) {
+				return $this->fail($exception);
+			}
+		);
 
 		// Handle ModelNotFoundExceptions RESTfully
-		App::error(function (ModelNotFoundException $exception) {
-			return $this->fail(
-				new NotFoundException(
-					[
-						'model' => $exception->getModel(),
-					],
-					'E_MODEL_NOT_FOUND'
-				)
-			);
-		});
+		App::error(
+			function (ModelNotFoundException $exception) {
+				return $this->fail(
+					new NotFoundException(
+						[
+							'model' => $exception->getModel(),
+						], 'E_MODEL_NOT_FOUND'
+					)
+				);
+			}
+		);
 
 		$this->logger = new Logger('API');
 
@@ -105,6 +115,7 @@ class Controller extends BaseController
 
 	/**
 	 * Add a log handler.
+	 *
 	 * @param \Monolog\Handler\AbstractProcessingHandler $handler
 	 * @return void
 	 */
@@ -118,8 +129,8 @@ class Controller extends BaseController
 	 *
 	 * @param mixed $data
 	 * @param int   $status_code
-	 * @param array $extra
-	 * @param array $extra_headers
+	 * @param array $headers
+	 * @param array $context
 	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
@@ -128,10 +139,14 @@ class Controller extends BaseController
 		// Handle paginated data differently
 		if ($data instanceof Paginator) {
 			// Pass in any additional query variables
-			foreach (array_except(
-				Request::instance()->query->all(),
-				[self::PAGINATION_CURRENT_PAGE, self::PAGINATION_PER_PAGE]
-			) as $key => $value) {
+			foreach (
+				array_except(
+					Request::instance()->query->all(), [
+						self::PAGINATION_CURRENT_PAGE,
+						self::PAGINATION_PER_PAGE
+					]
+				) as $key => $value
+			) {
 				$data->addQuery($key, $value);
 			}
 
@@ -151,33 +166,19 @@ class Controller extends BaseController
 			];
 
 			return $this->respond(
-				$data->getCollection()->toArray(),
-				$status_code,
-				$headers,
-				array_merge($context, compact('pagination'))
+				$data->getCollection()->toArray(), $status_code, $headers, array_merge($context, compact('pagination'))
 			);
 		} elseif ($data instanceof ArrayableInterface) {
-			return $this->respond(
-				$data->toArray(),
-				$status_code,
-				$headers,
-				$context
-			);
+			return $this->respond($data->toArray(), $status_code, $headers, $context);
 		}
 
-		return $this->respond(
-			$data,
-			$status_code,
-			$headers,
-			$context
-		);
+		return $this->respond($data, $status_code, $headers, $context);
 	}
 
 	/**
 	 * Notify the caller of failure.
 	 *
 	 * @param \Exception $exception
-	 * @param mixed      $data
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	final private function fail(\Exception $exception)
@@ -191,10 +192,7 @@ class Controller extends BaseController
 			$this->logger->addWarning($error, compact('exception'));
 
 			return $this->respond(
-				$exception->getData(),
-				$exception::STATUS_CODE,
-				$exception->getHeaders(),
-				compact('error')
+				$exception->getData(), $exception::STATUS_CODE, $exception->getHeaders(), compact('error')
 			);
 		}
 
@@ -214,19 +212,14 @@ class Controller extends BaseController
 		 */
 		$error = Config::get('app.debug') ? $exception->getMessage() : 'E_UNKNOWN';
 
-		return $this->respond(
-			null,
-			HttpException::STATUS_CODE,
-			[],
-			compact('error')
-		);
+		return $this->respond(null, HttpException::STATUS_CODE, [], compact('error'));
 	}
 
 	/**
 	 * Object not found.
 	 *
 	 * @param string $error
-	 * @param mixed $data
+	 * @param mixed  $data
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function notFound($error, $data = null)
@@ -238,7 +231,7 @@ class Controller extends BaseController
 	 * Access denied.
 	 *
 	 * @param string $error
-	 * @param mixed $data
+	 * @param mixed  $data
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function accessDenied($error, $data = null)
@@ -250,10 +243,10 @@ class Controller extends BaseController
 	 * Unauthorized.
 	 *
 	 * @param string $error
-	 * @param mixed $data
+	 * @param mixed  $data
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	public function unauthorized($error, $data= null)
+	public function unauthorized($error, $data = null)
 	{
 		return $this->respond($data, UnauthorizedException::STATUS_CODE, [], compact('error'));
 	}
@@ -262,7 +255,7 @@ class Controller extends BaseController
 	 * Bad request.
 	 *
 	 * @param string $error
-	 * @param mixed $data
+	 * @param mixed  $data
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function badRequest($error, $data = null)
@@ -279,12 +272,9 @@ class Controller extends BaseController
 	final private function expectMethods(array $valid_methods)
 	{
 		return $this->respond(
-			null,
-			405,
-			[
+			null, 405, [
 				'Allow' => implode(', ', $valid_methods),
-			],
-			[
+			], [
 				'error' => 'E_METHOD_NOT_ALLOWED',
 			]
 		);
@@ -302,16 +292,11 @@ class Controller extends BaseController
 	final private function respond($data, $status_code, $headers = [], $context = [])
 	{
 		return Response::json(
-			array_merge(compact('data'), $context),
-			$status_code,
-			array_merge(
+			array_merge(compact('data'), $context), $status_code, array_merge(
 				[
-					'Cache-Control' =>
-						($status_code === 200 && Request::method() === 'GET')
-						? 'public, max-age=' .  static::CACHE_TIME
-						: 'private, max-age=0'
-				],
-				$headers
+					'Cache-Control' => ($status_code === 200
+						&& Request::method() === 'GET') ? 'public, max-age=' . static::CACHE_TIME : 'private, max-age=0'
+				], $headers
 			)
 		);
 	}
@@ -334,7 +319,7 @@ class Controller extends BaseController
 		$uri       = $url_parts['path'];
 
 		$valid_methods = [];
-		$request = Request::instance();
+		$request       = Request::instance();
 
 		foreach (Route::getRoutes() as $route) {
 			if (
@@ -388,10 +373,7 @@ class Controller extends BaseController
 		}
 
 		if (count($missing_required) !== 0) {
-			throw new BadRequestException(
-				compact('missing_required'),
-				'E_MISSING_REQUIRED'
-			);
+			throw new BadRequestException(compact('missing_required'), 'E_MISSING_REQUIRED');
 		}
 
 		return $passed_parameters;
