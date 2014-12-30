@@ -348,7 +348,7 @@ class Controller extends BaseController
 	 *
 	 * @return int
 	 */
-	protected function getPerPage($default = self::PAGINATION_PER_PAGE_DEFAULT)
+	public static function getPerPage($default = self::PAGINATION_PER_PAGE_DEFAULT)
 	{
 		return min((int) Input::get(static::PAGINATION_PER_PAGE, $default), self::PAGINATION_PER_PAGE_MAXIMUM);
 	}
