@@ -20,7 +20,22 @@ Register a base controller extending Fuzz\ApiServer\Controller and assign an API
     	const API_VERSION = 1.0;
     }
 
-Add a Monolog-compatible handler for error logging:
+Register routes pointing to extensions of your base controller. Make a catch-all route to send all other requests through your base controller.
+
+    <?php
+    
+    class MySpecificController extends MyBaseController
+    {
+        public function someEndpoint() {
+            return $this->succeed('Foobar!');
+        }
+    }
+    
+    Route::get('some-endpoint', 'MySpecificController@someEndpoint');
+    // ...
+    Route::controller(null, 'MyBaseController');
+
+You can add any Monolog-compatible handler for error logging:
 
     <?php
     
@@ -92,4 +107,3 @@ Handles nested JSON and form properties just fine:
     
     // Corresponds with {"foo": {"bar": {"id": 9}}}
     list($foo, $bar_id) = $this->requireParameters('foo', 'foo.bar.id');
-
