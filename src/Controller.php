@@ -11,7 +11,7 @@ use Fuzz\ApiServer\Exception\AccessDeniedException;
 use Fuzz\ApiServer\Exception\BadRequestException;
 use Fuzz\ApiServer\Exception\NotFoundException;
 use Fuzz\ApiServer\Exception\UnauthorizedException;
-use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Request;
@@ -73,7 +73,7 @@ abstract class Controller extends BaseController
 	protected function succeed($data, $status_code = 200, $headers = [], $context = [])
 	{
 		// Append pagination data automatically
-		if ($data instanceof Paginator) {
+		if ($data instanceof AbstractPaginator) {
 			$pagination = $this->getPagination($data);
 			$data       = $data->getCollection();
 			$context    = array_merge($context, compact('pagination'));
@@ -197,10 +197,10 @@ abstract class Controller extends BaseController
 	/**
 	 * Get pagination metadata from a Paginator instance.
 	 *
-	 * @param  Paginator $paginator
+	 * @param  AbstractPaginator $paginator
 	 * @return array
 	 */
-	final private function getPagination(Paginator $paginator)
+	final private function getPagination(AbstractPaginator $paginator)
 	{
 		// Pass in any additional query variables
 		foreach (
