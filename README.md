@@ -7,18 +7,27 @@ A RESTful framework for rapid API development.
 ### Installation
 1. Register the custom Fuzz Composer repository: ```composer config repositories.fuzz composer https://satis.fuzzhq.com``` 
 2. Register the composer package: ```composer require fuzz/api-server```
+3. Extend the provided exception handler for your app's exception handler:
+
+    <?php
+    
+    namespace MyApp\Exceptions;
+    
+    use Fuzz\ApiServer\Exception\Handler as ExceptionHandler;
+    
+    class Handler extends ExceptionHandler
+    {
+        // ...
+    }
 
 ## Usage
 ### Basic usage
 
-Register a base controller extending Fuzz\ApiServer\Controller and assign an API version:
+Register a base controller extending Fuzz\ApiServer\Controller:
 
     <?php
     
-    class MyBaseController extends Fuzz\ApiServer\Controller
-    {
-    	const API_VERSION = 1.0;
-    }
+    class MyBaseController extends Fuzz\ApiServer\Controller {}
 
 Register routes pointing to extensions of your base controller. Make a catch-all route to send all other requests through your base controller.
 
@@ -37,15 +46,6 @@ Register routes pointing to extensions of your base controller. Make a catch-all
 
 You can add any Monolog-compatible handler for error logging:
 
-    <?php
-    
-    public function __construct()
-    {
-        parent::__construct();
-        $raven_client = new Raven_Client(Config::get('raven.dsn'), Config::get('raven.options', []));
-        $this->addLogHandler(new Monolog\Handler\RavenHandler($raven_client));
-    }
-    
 Send mixed data:
 
     <?php
@@ -88,13 +88,13 @@ Require the user to provide certain parameters:
 
     // Magically works with either JSON or form data
     list($foo, $bar) = $this->requireParameters('foo', 'bar');
-    
+
 Read a list of certain parameters:
 
     <?php
     
     list($foo, $bar) = $this->suggestParameters('foo', 'bar');
-    
+
 Special handling (with de-duplication) for reading arrays:
 
     <?php
