@@ -7,28 +7,20 @@
 
 namespace Fuzz\ApiServer;
 
-use Monolog\Logger;
-use Monolog\Handler\AbstractProcessingHandler;
-use Illuminate\Support\Facades\App;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Request;
-use Illuminate\Support\Facades\Response;
-use Illuminate\Support\Contracts\ArrayableInterface;
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Fuzz\ApiServer\Exception\HttpException;
-use Fuzz\ApiServer\Exception\NotFoundException;
+use Fuzz\ApiServer\Exception\AccessDeniedException;
 use Fuzz\ApiServer\Exception\BadRequestException;
+use Fuzz\ApiServer\Exception\NotFoundException;
 use Fuzz\ApiServer\Exception\UnauthorizedException;
-Use Fuzz\ApiServer\Exception\AccessDeniedException;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Routing\Controller as BaseController;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Route;
 
 /**
  * API Base Controller class.
  */
-class Controller extends BaseController
+abstract class Controller extends BaseController
 {
 	/**
 	 * Parameter name for pagination controller: items per page.
