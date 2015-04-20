@@ -2,10 +2,12 @@
 
 namespace Fuzz\ApiServer;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Response;
-use Fuzz\ApiServer\Exception\HttpException;
 use Illuminate\Contracts\Support\Arrayable;
+use Symfony\Component\HttpFoundation\Response;
+use League\OAuth2\Server\Exception\OAuthException;
+use Fuzz\ApiServer\Exception\OAuthException as FuzzOAuthException;
 
 class Responder
 {
@@ -15,16 +17,15 @@ class Responder
 	 * @param mixed $data
 	 * @param int   $status_code
 	 * @param array $headers
-	 * @param array $context
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	final public function send($data, $status_code, $headers, $context)
+	final public function send($data, $status_code, $headers)
 	{
 		if ($data instanceof Arrayable) {
 			$data = $data->toArray();
 		}
 
-		return Response::json(array_merge(compact('data'), $context), $status_code, $headers);
+		return new JsonResponse($data, $status_code, $headers);
 	}
 
 	/**
@@ -38,38 +39,37 @@ class Responder
 		/**
 		 * Handle known HTTP exceptions RESTfully.
 		 */
-		if ($exception instanceof HttpException) {
-			$error = $exception->getMessage();
+		if ($exception instanceof OAuthException) {
+			$error             = $exception->errorType;
+			$error_description = $exception->getMessage();
+			$status_code       = $exception->httpStatusCode;
+			$headers           = $exception->getHttpHeaders();
 
-			return $this->send(
-				$exception->getData(),
-				$exception::STATUS_CODE,
-				$exception->getHeaders(),
-				compact('error')
-			);
-		}
-
-		/**
-		 * Contextualize response with verbose information outside production.
-		 *
-		 * Report only "unknown" errors in production.
-		 */
-		if (Config::get('app.debug')) {
-			$error = [
-				'message' => $exception->getMessage(),
-				'class' => get_class($exception),
-				'file' => $exception->getFile(),
-				'line' => $exception->getLine(),
-			];
+			$error_data = ($exception instanceof FuzzOAuthException) ? $exception->errorData : null;
 		} else {
-			$error = 'E_UNKNOWN';
+			/**
+			 * Contextualize response with verbose information outside production.
+			 *
+			 * Report only "unknown" errors in production.
+			 */
+			$error = 'unknown';
+
+			if (Config::get('app.debug')) {
+				$error_description = [
+					'message' => $exception->getMessage(),
+					'class'   => get_class($exception),
+					'file'    => $exception->getFile(),
+					'line'    => $exception->getLine(),
+				];
+			}
+
+			$status_code = Response::HTTP_INTERNAL_SERVER_ERROR;
+
+			$headers = [];
 		}
 
 		return $this->send(
-			null,
-			HttpException::STATUS_CODE,
-			[],
-			compact('error')
+			compact('error', 'error_description', 'error_data'), $status_code, $headers
 		);
 	}
 }
