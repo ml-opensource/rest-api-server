@@ -18,13 +18,10 @@ class Handler extends ExceptionHandler
 	 */
 	public function render($request, Exception $e)
 	{
-		// Recase ModelNotFoundExceptions as local NotFoundExceptions
+		// Recast ModelNotFoundExceptions as local NotFoundExceptions
 		if ($e instanceof ModelNotFoundException) {
 			$e = new NotFoundException(
-				[
-					'model' => $e->getModel(),
-				],
-				'E_MODEL_NOT_FOUND'
+				'Unable to find ' . $e->getModel() . '.'
 			);
 		}
 

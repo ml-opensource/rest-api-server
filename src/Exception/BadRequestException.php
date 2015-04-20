@@ -2,8 +2,22 @@
 
 namespace Fuzz\ApiServer\Exception;
 
-class BadRequestException extends HttpException
+use Symfony\Component\HttpFoundation\Response;
+
+class BadRequestException extends OAuthException
 {
-	const ERROR_CODE  = 'E_BAD_REQUEST';
-	const STATUS_CODE = 400;
+	/**
+	 * @inheritDoc
+	 */
+	const DEFAULT_MESSAGE = 'Unable to fulfill this request.';
+
+	/**
+	 * @inheritDoc
+	 */
+	const DEFAULT_ERROR_TYPE = 'bad_request';
+
+	/**
+	 * @inheritDoc
+	 */
+	const DEFAULT_STATUS_CODE = Response::HTTP_BAD_REQUEST;
 }

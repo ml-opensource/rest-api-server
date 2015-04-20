@@ -2,8 +2,22 @@
 
 namespace Fuzz\ApiServer\Exception;
 
-class NotFoundException extends HttpException
+use Symfony\Component\HttpFoundation\Response;
+
+class NotFoundException extends OAuthException
 {
-	const ERROR_CODE  = 'E_NOT_FOUND';
-	const STATUS_CODE = 404;
+	/**
+	 * @inheritDoc
+	 */
+	const DEFAULT_MESSAGE = 'The resource was not found.';
+
+	/**
+	 * @inheritDoc
+	 */
+	const DEFAULT_ERROR_TYPE = 'not_found';
+
+	/**
+	 * @inheritDoc
+	 */
+	const DEFAULT_STATUS_CODE = Response::HTTP_NOT_FOUND;
 }
