@@ -129,6 +129,7 @@ abstract class Controller extends BaseController
 		return $this->getResponder()->send(
 			[
 				'error' => 'method_not_allowed',
+				'error_data' => compact('valid_methods'),
 			], 405, [
 				'Allow' => implode(', ', $valid_methods),
 			]

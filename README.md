@@ -6,8 +6,9 @@ A RESTful framework for rapid API development.
 
 ### Installation
 1. Register the custom Fuzz Composer repository: ```composer config repositories.fuzz composer https://satis.fuzzhq.com``` 
-2. Register the composer package: ```composer require fuzz/api-server```
-3. Extend the provided exception handler for your app's exception handler:
+1. Register the composer package: ```composer require fuzz/api-server```
+1. Register the service provider in your AppServiceProvider: ```$this->app->register(new \Fuzz\ApiServer\ApiServiceProvider($this->app));```
+1. Extend the provided exception handler for your app's exception handler:
 
     <?php
     
@@ -68,19 +69,17 @@ Send RESTful errors with error codes and optional data:
 
     <?php
     
-    return $this->badRequest('E_INVALID_FIELDS', ['fields' => ['foo', 'bar']]);
-    return $this->unauthorized('E_BAD_ACCESS_TOKEN');
-    return $this->accessDenied('E_NICE_TRY');
-    return $this->notFound('E_MISPLACED_MOJO');
+    $this->badRequest('That button does not do what you think it does.');
+    $this->forbidden('Maybe next time.');
+    $this->notFound();
 
 Raise RESTful error exceptions outside of the controller context:
 
     <?php
     
-    throw new Fuzz\ApiServer\Exception\BadRequestException(['fields' => ['foo', 'bar'], 'E_INVALID_FIELDS');
-    throw new Fuzz\ApiServer\Exception\UnauthorizedException(null, 'E_BAD_ACCESS_TOKEN');
-    throw new Fuzz\ApiServer\Exception\AccessDeniedException(null, 'E_NICE_TRY');
-    throw new Fuzz\ApiServer\Exception\NotFoundException(null, 'E_MISPLACED_MOJO');
+    throw new Fuzz\ApiServer\Exception\BadRequestException;
+    throw new Fuzz\ApiServer\Exception\ForbiddenException;
+    throw new Fuzz\ApiServer\Exception\NotFoundException;
     
 Require the user to provide certain parameters:
 
