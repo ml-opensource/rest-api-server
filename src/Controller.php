@@ -7,10 +7,9 @@
 
 namespace Fuzz\ApiServer;
 
-use Fuzz\ApiServer\Exception\AccessDeniedException;
 use Fuzz\ApiServer\Exception\BadRequestException;
+use Fuzz\ApiServer\Exception\ForbiddenException;
 use Fuzz\ApiServer\Exception\NotFoundException;
-use Fuzz\ApiServer\Exception\UnauthorizedException;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Input;
@@ -70,64 +69,53 @@ abstract class Controller extends BaseController
 	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	protected function succeed($data, $status_code = 200, $headers = [], $context = [])
+	protected function succeed($data, $status_code = 200, $headers = [])
 	{
 		// Append pagination data automatically
 		if ($data instanceof AbstractPaginator) {
 			$pagination = $this->getPagination($data);
 			$data       = $data->getCollection();
-			$context    = array_merge($context, compact('pagination'));
 		}
 
-		return $this->getResponder()->send($data, $status_code, $headers, $context);
+		return $this->getResponder()->send(compact('data', 'pagination'), $status_code, $headers);
 	}
 
 	/**
 	 * Object not found.
 	 *
-	 * @param string $error
+	 * @param string $message
 	 * @param mixed  $data
-	 * @return \Illuminate\Http\JsonResponse
+	 * @throws \Fuzz\ApiServer\Exception\NotFoundException
+	 * @return void
 	 */
-	protected function notFound($error, $data = null)
+	protected function notFound($message = null, $data = null)
 	{
-		return $this->getResponder()->send($data, NotFoundException::STATUS_CODE, [], compact('error'));
+		throw new NotFoundException($message, $data);
 	}
 
 	/**
 	 * Access denied.
 	 *
-	 * @param string $error
+	 * @param string $message
 	 * @param mixed  $data
-	 * @return \Illuminate\Http\JsonResponse
+	 * @throws \Fuzz\ApiServer\Exception\ForbiddenException
+	 * @return void
 	 */
-	protected function accessDenied($error, $data = null)
+	protected function forbidden($message = null, $data = null)
 	{
-		return $this->getResponder()->send($data, AccessDeniedException::STATUS_CODE, [], compact('error'));
-	}
-
-	/**
-	 * Unauthorized.
-	 *
-	 * @param string $error
-	 * @param mixed  $data
-	 * @return \Illuminate\Http\JsonResponse
-	 */
-	protected function unauthorized($error, $data = null)
-	{
-		return $this->getResponder()->send($data, UnauthorizedException::STATUS_CODE, [], compact('error'));
+		throw new ForbiddenException($message, $data);
 	}
 
 	/**
 	 * Bad request.
 	 *
-	 * @param string $error
-	 * @param mixed  $data
-	 * @return \Illuminate\Http\JsonResponse
+	 * @param string $message
+	 * @throws \Fuzz\ApiServer\Exception\BadRequestException
+	 * @return void
 	 */
-	protected function badRequest($error, $data = null)
+	protected function badRequest($message = null, $data = null)
 	{
-		return $this->getResponder()->send($data, BadRequestException::STATUS_CODE, [], compact('error'));
+		throw new BadRequestException($message, $data);
 	}
 
 	/**
@@ -139,10 +127,10 @@ abstract class Controller extends BaseController
 	final private function expectMethods(array $valid_methods)
 	{
 		return $this->getResponder()->send(
-			null, 405, [
+			[
+				'error' => 'method_not_allowed',
+			], 405, [
 				'Allow' => implode(', ', $valid_methods),
-			], [
-				'error' => 'E_METHOD_NOT_ALLOWED',
 			]
 		);
 	}
@@ -181,7 +169,7 @@ abstract class Controller extends BaseController
 		}
 
 		// Otherwise, this is a simple 404
-		return $this->notFound('E_NO_ROUTE');
+		$this->notFound();
 	}
 
 	/**
@@ -248,7 +236,7 @@ abstract class Controller extends BaseController
 		}
 
 		if (count($missing_required) !== 0) {
-			throw new BadRequestException(compact('missing_required'), 'E_MISSING_REQUIRED');
+			$this->badRequest('Required fields were not provided.', compact('missing_required'));
 		}
 
 		return $passed_parameters;
