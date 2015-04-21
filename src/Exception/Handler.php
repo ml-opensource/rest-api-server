@@ -3,7 +3,7 @@
 namespace Fuzz\ApiServer\Exception;
 
 use Exception;
-use Fuzz\ApiServer\Responder;
+use Fuzz\ApiServer\Routing\Responder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 

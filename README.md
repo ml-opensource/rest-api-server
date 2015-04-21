@@ -24,11 +24,11 @@ A RESTful framework for rapid API development.
 ## Usage
 ### Basic usage
 
-Register a base controller extending Fuzz\ApiServer\Controller:
+Register a base controller extending Fuzz\ApiServer\Routing\Controller:
 
     <?php
     
-    class MyBaseController extends Fuzz\ApiServer\Controller {}
+    class MyBaseController extends Fuzz\ApiServer\Routing\Controller {}
 
 Register routes pointing to extensions of your base controller. Make a catch-all route to send all other requests through your base controller.
 

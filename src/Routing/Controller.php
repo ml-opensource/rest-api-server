@@ -5,16 +5,16 @@
  * Defines the base API server.
  */
 
-namespace Fuzz\ApiServer;
+namespace Fuzz\ApiServer\Routing;
 
-use Fuzz\ApiServer\Exception\BadRequestException;
-use Fuzz\ApiServer\Exception\ForbiddenException;
-use Fuzz\ApiServer\Exception\NotFoundException;
-use Illuminate\Pagination\AbstractPaginator;
-use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Pagination\AbstractPaginator;
+use Fuzz\ApiServer\Exception\NotFoundException;
+use Fuzz\ApiServer\Exception\ForbiddenException;
+use Fuzz\ApiServer\Exception\BadRequestException;
+use Illuminate\Routing\Controller as BaseController;
 
 /**
  * API Base Controller class.
@@ -128,7 +128,7 @@ abstract class Controller extends BaseController
 	{
 		return $this->getResponder()->send(
 			[
-				'error' => 'method_not_allowed',
+				'error'      => 'method_not_allowed',
 				'error_data' => compact('valid_methods'),
 			], 405, [
 				'Allow' => implode(', ', $valid_methods),

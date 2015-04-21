@@ -1,6 +1,6 @@
 <?php
 
-namespace Fuzz\ApiServer;
+namespace Fuzz\ApiServer\Routing;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Config;
