@@ -16,8 +16,33 @@ class ApiServiceProvider extends ServiceProvider
 	 */
 	public function register()
 	{
-		// Register the service providers associated with the lucadegasperi/oauth2-server-laravel package
+		$this->registerOAuthProviders();
+		$this->registerCommands();
+	}
+
+	/**
+	 * Register the service providers associated with the
+	 * lucadegasperi/oauth2-server-laravel package.
+	 *
+	 * @return void
+	 */
+	protected function registerOAuthProviders()
+	{
 		$this->app->register(new FluentStorageServiceProvider($this->app));
 		$this->app->register(new OAuth2ServerServiceProvider($this->app));
+	}
+
+	/**
+	 * Register the commands provided by this package.
+	 *
+	 * @return void
+	 */
+	protected function registerCommands()
+	{
+		$this->commands(
+			[
+				'Fuzz\ApiServer\Console\ApiInitializeCommand',
+			]
+		);
 	}
 }
