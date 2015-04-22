@@ -2,14 +2,11 @@
 
 namespace Fuzz\ApiServer\Console;
 
-use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
-use Illuminate\Database\DatabaseManager;
 use Illuminate\Console\AppNamespaceDetectorTrait;
 use LucaDegasperi\OAuth2Server\Storage\FluentScope;
 use LucaDegasperi\OAuth2Server\Storage\FluentClient;
-use Illuminate\Contracts\Config\Repository as ConfigRepository;
 
 class ApiInitializeCommand extends Command
 {
