@@ -7,6 +7,8 @@ use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Console\AppNamespaceDetectorTrait;
+use LucaDegasperi\OAuth2Server\Storage\FluentScope;
+use LucaDegasperi\OAuth2Server\Storage\FluentClient;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 
 class ApiInitializeCommand extends Command
@@ -31,32 +33,31 @@ class ApiInitializeCommand extends Command
 	protected $description = 'Initialize an API code base.';
 
 	/**
-	 * The configuration repository.
+	 * The client repo.
 	 *
-	 * @var \Illuminate\Contracts\Config\Repository
+	 * @var \LucaDegasperi\OAuth2Server\Storage\FluentClient
 	 */
-	protected $config;
+	protected $client_repository;
 
 	/**
-	 * The database manager.
+	 * The scope repo.
 	 *
-	 * @var \Illuminate\Database\DatabaseManager
+	 * @var \LucaDegasperi\OAuth2Server\Storage\FluentScope
 	 */
-	protected $db;
+	protected $scope_repository;
 
 	/**
 	 * Class constructor.
 	 *
-	 * @param \Illuminate\Contracts\Config\Repository $config
-	 * @param \Illuminate\Database\DatabaseManager    $db
+	 * @param \LucaDegasperi\OAuth2Server\Storage\FluentClient $client_repository
 	 * @return self
 	 */
-	public function __construct(ConfigRepository $config, DatabaseManager $db)
+	public function __construct(FluentClient $client_repository, FluentScope $scope_repository)
 	{
 		parent::__construct();
 
-		$this->config = $config;
-		$this->db     = $db;
+		$this->client_repository = $client_repository;
+		$this->scope_repository  = $scope_repository;
 	}
 
 	/**
@@ -106,24 +107,22 @@ class ApiInitializeCommand extends Command
 	 */
 	private function createAuthorizationDefaults()
 	{
-		$client_name = Str::slug($this->getAppNamespace());
-		$this->call('oauth2-server:create-client', ['clientName' => $client_name]);
+		$namespace     = str_replace('\\', '', $this->getAppNamespace());
+		$client_name   = Str::slug($namespace, '_');
+		$client_id     = Str::random();
+		$client_secret = Str::random(32);
 
-		$fresh_timestamp = new Carbon;
+		$this->client_repository->create($client_name, $client_id, $client_secret);
+		$this->info('Client created successfully!');
 
-		$db_connection = $this->config->get('oauth2.database');
+		$scope_id          = sprintf('%s_user', $client_name);
+		$scope_description = sprintf('Default user scope for %s.', $namespace);
 
-		if ($db_connection === 'default') {
-			$db_connection = $this->config->get('database.default');
-		}
+		$this->scope_repository->create($scope_id, $scope_description);
+		$this->info('Scope created successfully!');
 
-		$this->db->connection($db_connection)->table('oauth_scopes')->insert(
-			[
-				'id'          => 'user',
-				'description' => 'The default scope for users.',
-				'created_at'  => $fresh_timestamp,
-				'updated_at'  => $fresh_timestamp,
-			]
-		);
+		$this->comment(sprintf('Client ID:     %s', $client_id));
+		$this->comment(sprintf('Client Secret: %s', $client_secret));
+		$this->comment(sprintf('Scope ID:      %s', $scope_id));
 	}
 }

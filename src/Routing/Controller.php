@@ -65,7 +65,6 @@ abstract class Controller extends BaseController
 	 * @param mixed $data
 	 * @param int   $status_code
 	 * @param array $headers
-	 * @param array $context
 	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
