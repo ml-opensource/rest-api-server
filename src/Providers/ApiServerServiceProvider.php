@@ -1,12 +1,12 @@
 <?php
 
-namespace Fuzz\ApiServer;
+namespace Fuzz\ApiServer\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider;
 use LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider;
 
-class ApiServiceProvider extends ServiceProvider
+class ApiServerServiceProvider extends ServiceProvider
 {
 
 	/**

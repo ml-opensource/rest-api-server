@@ -7,9 +7,27 @@ A RESTful framework for rapid API development.
 ### Installation
 1. Register the custom Fuzz Composer repository: ```composer config repositories.fuzz composer https://satis.fuzzhq.com``` 
 1. Register the composer package: ```composer require fuzz/api-server```
-1. Register the service provider in your AppServiceProvider: ```$this->app->register(new \Fuzz\ApiServer\ApiServiceProvider($this->app));```
-1. Initialize the package dependencies after your database is configured: ```artisan api:initialize```
-1. Extend the provided exception handler for your app's exception handler:
+1. Register the service provider in your AppServiceProvider:
+
+    <?php
+    
+    public function register()
+    {
+        $this->app->register(new ApiServerServiceProvider($this->app));
+    }
+
+1. Extend the packaged route provider for your app:
+
+    <?php
+    
+    use Fuzz\ApiServer\Providers\RouteServiceProvider as ServiceProvider;
+    
+    class RouteServiceProvider extends ServiceProvider
+    {
+        // ...
+    }
+
+1. Extend the packaged exception handler for your app:
 
     <?php
     
@@ -21,6 +39,8 @@ A RESTful framework for rapid API development.
     {
         // ...
     }
+
+1. Initialize the package dependencies after your database is configured: ```artisan api:initialize```
 
 ## Usage
 ### Basic usage
