@@ -21,7 +21,7 @@ class Handler extends ExceptionHandler
 		// Recast ModelNotFoundExceptions as local NotFoundExceptions
 		if ($e instanceof ModelNotFoundException) {
 			$e = new NotFoundException(
-				'Unable to find ' . $e->getModel() . '.'
+				'Unable to find ' . class_basename($e->getModel()) . '.'
 			);
 		}
 
