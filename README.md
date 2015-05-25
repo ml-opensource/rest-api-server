@@ -3,6 +3,21 @@ Laravel API Server
 
 A RESTful framework for rapid API development.
 
+### Compatibility Notice!
+
+Until some outstanding issues are resolved, be sure to resolve Sasha's fork of the oauth2-server-laravel package in your composer.json:
+```
+    "repositories": {
+		"fuzz": {
+			"type": "composer",
+			"url": "https://satis.fuzzhq.com"
+		},
+		"oauth2": {
+			"type": "vcs",
+			"url": "https://github.com/stristr/oauth2-server-laravel.git"
+		}
+	}
+```
 
 ### Installation
 1. Register the custom Fuzz Composer repository: ```composer config repositories.fuzz composer https://satis.fuzzhq.com``` 
