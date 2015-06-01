@@ -7,6 +7,7 @@
 
 namespace Fuzz\ApiServer\Routing;
 
+use Fuzz\ApiServer\Exception\NotImplementedException;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Request;
@@ -115,6 +116,18 @@ abstract class Controller extends BaseController
 	protected function badRequest($message = null, $data = null)
 	{
 		throw new BadRequestException($message, $data);
+	}
+
+	/**
+	 * Not implemented.
+	 *
+	 * @param string $message
+	 * @throws \Fuzz\ApiServer\Exception\NotImplementedException
+	 * @return void
+	 */
+	protected function notImplemented($message = null, $data = null)
+	{
+		throw new NotImplementedException($message, $data);
 	}
 
 	/**
