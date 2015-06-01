@@ -16,11 +16,7 @@ class RouteServiceProvider extends ServiceProvider
 	{
 		// Always implement the token dance
 		$this->app['router']->post(
-			'oauth/access_token', function () {
-				return new JsonResponse(
-					$this->app['oauth2-server.authorizer']->issueAccessToken()
-				);
-			}
+			'oauth/access_token', 'Fuzz\ApiServer\Routing\OAuthController@issueAccessToken'
 		);
 
 		parent::loadRoutes();
