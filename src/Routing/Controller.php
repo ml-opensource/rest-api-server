@@ -7,7 +7,6 @@
 
 namespace Fuzz\ApiServer\Routing;
 
-use Fuzz\ApiServer\Exception\NotImplementedException;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Request;
@@ -15,12 +14,14 @@ use Illuminate\Pagination\AbstractPaginator;
 use Fuzz\ApiServer\Exception\NotFoundException;
 use Fuzz\ApiServer\Exception\ForbiddenException;
 use Fuzz\ApiServer\Exception\BadRequestException;
-use Illuminate\Routing\Controller as BaseController;
+use Fuzz\ApiServer\Exception\NotImplementedException;
+use Illuminate\Routing\Controller as RoutingBaseController;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * API Base Controller class.
  */
-abstract class Controller extends BaseController
+abstract class Controller extends RoutingBaseController
 {
 	/**
 	 * Parameter name for pagination controller: items per page.
@@ -69,7 +70,7 @@ abstract class Controller extends BaseController
 	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	protected function succeed($data, $status_code = 200, $headers = [])
+	protected function succeed($data, $status_code = Response::HTTP_OK, $headers = [])
 	{
 		// Append pagination data automatically
 		if ($data instanceof AbstractPaginator) {
@@ -78,6 +79,20 @@ abstract class Controller extends BaseController
 		}
 
 		return $this->getResponder()->send(compact('data', 'pagination'), $status_code, $headers);
+	}
+
+	/**
+	 * Created!
+	 *
+	 * @param mixed $data
+	 * @param int   $status_code
+	 * @param array $headers
+	 *
+	 * @return \Illuminate\Http\JsonResponse
+	 */
+	protected function created($data, $headers = [])
+	{
+		return $this->succeed($data, Response::HTTP_CREATED, $headers);
 	}
 
 	/**
