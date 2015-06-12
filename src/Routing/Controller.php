@@ -236,7 +236,7 @@ abstract class Controller extends RoutingBaseController
 		// Prepare useful pagination metadata
 		return [
 			'page'     => $paginator->currentPage(),
-			'total'    => $paginator->count(),
+			'total'    => $paginator->total(),
 			'per_page' => $paginator->perPage(),
 			'next'     => $paginator->nextPageUrl(),
 			'previous' => $paginator->previousPageUrl(),
