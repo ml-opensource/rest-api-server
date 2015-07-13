@@ -52,27 +52,26 @@ class CorsMiddleware
 	/**
 	 * Add pre-flight headers to the response.
 	 *
-	 * @param \Illuminate\Http\Request  $request
+	 * @param \Illuminate\Http\Request                   $request
 	 * @param \Symfony\Component\HttpFoundation\Response $response
 	 * @return void
 	 */
 	private function addPreflightHeaders(Request $request, Response $response)
 	{
 		$response->headers->set('Access-Control-Allow-Origin', '*');
-		$response->headers->set('Access-Control-Allow-Headers', '*');
+		$response->headers->set('Access-Control-Allow-Headers', strtoupper($request->headers->get('Access-Control-Request-Headers')));
 		$response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
 	}
 
 	/**
 	 * Add CORS headers to the response.
 	 *
-	 * @param \Illuminate\Http\Request  $request
+	 * @param \Illuminate\Http\Request                   $request
 	 * @param \Symfony\Component\HttpFoundation\Response $response
 	 * @return void
 	 */
 	private function addCorsHeaders(Request $request, Response $response)
 	{
-		$response->headers->set('Access-Control-Allow-Origin', '*');
 		$vary_headers   = array_filter(explode(', ', $request->header('Vary')));
 		$vary_headers[] = 'Origin';
 		$response->headers->set('Vary', implode(', ', array_unique($vary_headers)));

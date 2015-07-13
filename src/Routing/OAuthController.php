@@ -15,8 +15,6 @@ class OAuthController extends Controller
 	 */
 	public function issueAccessToken(Application $app)
 	{
-		return new JsonResponse(
-			$app['oauth2-server.authorizer']->issueAccessToken()
-		);
+		return (new Responder)->send($app['oauth2-server.authorizer']->issueAccessToken());
 	}
 }
