@@ -2,6 +2,7 @@
 
 namespace Fuzz\ApiServer\Providers;
 
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 use LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider;
 use LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider;
@@ -18,6 +19,17 @@ class ApiServerServiceProvider extends ServiceProvider
 	{
 		$this->registerOAuthProviders();
 		$this->registerCommands();
+	}
+
+	/**
+	 * Add the Cors middleware to the HTTP kernel.
+	 *
+	 * @param \Illuminate\Contracts\Http\Kernel $kernel
+	 * @return void
+	 */
+	public function boot(Kernel $kernel)
+	{
+		$kernel->pushMiddleware('Fuzz\ApiServer\Routing\CorsMiddleware');
 	}
 
 	/**
