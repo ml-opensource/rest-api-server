@@ -80,7 +80,7 @@ class ApiInitializeCommand extends Command
 			'--provider' => 'LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider',
 		];
 
-		if ($this->confirm('Overwrite existing package configuration and migrations? (no)')) {
+		if ($this->confirm('Overwrite existing package configuration and migrations?')) {
 			$parameters['--force'] = 1;
 		}
 
