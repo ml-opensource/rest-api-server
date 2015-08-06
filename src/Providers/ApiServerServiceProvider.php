@@ -4,6 +4,7 @@ namespace Fuzz\ApiServer\Providers;
 
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
+use Fuzz\ApiServer\Console\ApiInitializeCommand;
 use LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider;
 use LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider;
 
@@ -53,7 +54,7 @@ class ApiServerServiceProvider extends ServiceProvider
 	{
 		$this->commands(
 			[
-				'Fuzz\ApiServer\Console\ApiInitializeCommand',
+				ApiInitializeCommand::class
 			]
 		);
 	}

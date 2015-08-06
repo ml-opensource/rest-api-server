@@ -76,9 +76,7 @@ class ApiInitializeCommand extends Command
 	 */
 	private function publishVendorPackages()
 	{
-		$parameters = [
-			'--provider' => 'LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider',
-		];
+		$parameters = [];
 
 		if ($this->confirm('Overwrite existing package configuration and migrations?')) {
 			$parameters['--force'] = 1;
