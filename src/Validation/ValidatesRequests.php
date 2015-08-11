@@ -2,39 +2,35 @@
 
 namespace Fuzz\ApiServer\Validation;
 
-use Fuzz\ApiServer\Exception\BadRequestException;
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\Validator;
-use Illuminate\Http\Exception\HttpResponseException;
+use Fuzz\ApiServer\Exception\BadRequestException;
 
 trait ValidatesRequests
 {
 	/**
 	 * Validate the given request with the given rules.
 	 *
-	 * @param  \Illuminate\Http\Request $request
-	 * @param  array                    $rules
-	 * @param  array                    $messages
+	 * @param  array $request
+	 * @param  array $rules
+	 * @param  array $messages
 	 * @return void
 	 */
-	public function validate(Request $request, array $rules, array $messages = [])
+	public function validate(array $input, array $rules, array $messages = [])
 	{
-		$validator = $this->getValidationFactory()->make($request->all(), $rules, $messages);
+		$validator = $this->getValidationFactory()->make($input, $rules, $messages);
 
 		if ($validator->fails()) {
-			$this->throwValidationException($request, $validator);
+			$this->throwValidationException($validator);
 		}
 	}
 
 	/**
 	 * Throw the failed validation exception.
 	 *
-	 * @param  \Illuminate\Http\Request                   $request
 	 * @param  \Illuminate\Contracts\Validation\Validator $validator
 	 * @return void
 	 */
-	protected function throwValidationException(Request $request, Validator $validator)
+	protected function throwValidationException(Validator $validator)
 	{
 		throw new BadRequestException('Request validation failed.', $validator->errors()->getMessages());
 	}
