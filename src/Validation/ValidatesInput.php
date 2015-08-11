@@ -2,37 +2,25 @@
 
 namespace Fuzz\ApiServer\Validation;
 
-use Illuminate\Validation\Validator;
 use Fuzz\ApiServer\Exception\BadRequestException;
 
-trait ValidatesRequests
+trait ValidatesInput
 {
 	/**
 	 * Validate the given request with the given rules.
 	 *
-	 * @param  array $request
+	 * @param array  $input
 	 * @param  array $rules
 	 * @param  array $messages
-	 * @return void
+	 * @throws \Fuzz\ApiServer\Exception\BadRequestException
 	 */
 	public function validate(array $input, array $rules, array $messages = [])
 	{
 		$validator = $this->getValidationFactory()->make($input, $rules, $messages);
 
 		if ($validator->fails()) {
-			$this->throwValidationException($validator);
+			throw new BadRequestException('Request validation failed.', $validator->errors()->getMessages());
 		}
-	}
-
-	/**
-	 * Throw the failed validation exception.
-	 *
-	 * @param  \Illuminate\Contracts\Validation\Validator $validator
-	 * @return void
-	 */
-	protected function throwValidationException(Validator $validator)
-	{
-		throw new BadRequestException('Request validation failed.', $validator->errors()->getMessages());
 	}
 
 	/**
