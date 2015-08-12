@@ -173,7 +173,7 @@ abstract class Controller extends RoutingBaseController
 	public function missingMethod($parameters = [])
 	{
 		// Check if there are valid methods that could have been used
-		$url_parts = parse_url($_SERVER['REQUEST_URI']);
+		$url_parts = parse_url(app('request')->getRequestUri());
 		$uri       = $url_parts['path'];
 
 		$valid_methods = [];
