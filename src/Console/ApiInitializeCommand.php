@@ -79,11 +79,7 @@ class ApiInitializeCommand extends Command
 	{
 		$parameters = [];
 
-		if ($this->confirm('Overwrite existing package configuration and migrations?')) {
-			$parameters['--force'] = 1;
-		}
-
-		$this->call('vendor:publish', $parameters);
+		$this->call('vendor:publish', ['--force' => 1]);
 	}
 
 	/**
