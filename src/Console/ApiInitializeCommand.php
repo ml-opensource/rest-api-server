@@ -4,6 +4,7 @@ namespace Fuzz\ApiServer\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Input\InputOption;
 use Illuminate\Console\AppNamespaceDetectorTrait;
 use LucaDegasperi\OAuth2Server\Storage\FluentScope;
 use LucaDegasperi\OAuth2Server\Storage\FluentClient;
@@ -92,7 +93,9 @@ class ApiInitializeCommand extends Command
 	 */
 	private function runVendorPackageMigrations()
 	{
-		$this->call('migrate');
+		$this->call('migrate', [
+			'--database' => $this->input->getOption('database'),
+		]);
 	}
 
 	/**
@@ -119,5 +122,22 @@ class ApiInitializeCommand extends Command
 		$this->comment(sprintf('Client ID:     %s', $client_id));
 		$this->comment(sprintf('Client Secret: %s', $client_secret));
 		$this->comment(sprintf('Scope ID:      %s', $scope_id));
+	}
+
+	/**
+	 * Get the console command options.
+	 *
+	 * @return array
+	 */
+	protected function getOptions()
+	{
+		return [
+			[
+				'database',
+				null,
+				InputOption::VALUE_OPTIONAL,
+				'The database connection to use.',
+			],
+		];
 	}
 }
