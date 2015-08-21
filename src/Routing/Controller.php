@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Pagination\AbstractPaginator;
+use Fuzz\ApiServer\Exception\ConflictException;
 use Fuzz\ApiServer\Exception\NotFoundException;
 use Fuzz\ApiServer\Exception\ForbiddenException;
 use Fuzz\ApiServer\Exception\BadRequestException;
@@ -143,6 +144,19 @@ abstract class Controller extends RoutingBaseController
 	protected function notImplemented($message = null, $data = null)
 	{
 		throw new NotImplementedException($message, $data);
+	}
+
+	/**
+	 * Conflict
+	 *
+	 * @param string $message
+	 * @param string $data
+	 * @throws \Fuzz\ApiServer\Exception\ConflictException
+	 * @return void
+	 */
+	protected function conflict($message = null, $data = null)
+	{
+		throw new ConflictException($message, $data);
 	}
 
 	/**
