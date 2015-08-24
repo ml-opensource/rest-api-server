@@ -19,7 +19,7 @@ class Responder
 	 * @param array $headers
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	final public function send($data, $status_code = Response::HTTP_OK, array $headers = [])
+	final public function send($data, $status_code = Response::HTTP_OK, array $headers = [], $json = true)
 	{
 		if ($data instanceof Arrayable) {
 			$data = $data->toArray();
@@ -27,7 +27,11 @@ class Responder
 
 		$headers['Access-Control-Allow-Origin'] = '*';
 
-		return new JsonResponse($data, $status_code, $headers);
+		if ($json) {
+			return new JsonResponse($data, $status_code, $headers);
+		}
+
+		return response($data, $status_code, $headers);
 	}
 
 	/**
