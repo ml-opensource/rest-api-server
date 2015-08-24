@@ -14,9 +14,10 @@ class Responder
 	/**
 	 * Send a response.
 	 *
-	 * @param mixed $data
-	 * @param int   $status_code
-	 * @param array $headers
+	 * @param mixed   $data
+	 * @param int     $status_code
+	 * @param array   $headers
+	 * @param boolean $json
 	 * @return \Illuminate\Http\JsonResponse
 	 */
 	final public function send($data, $status_code = Response::HTTP_OK, array $headers = [], $json = true)
