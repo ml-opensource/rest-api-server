@@ -60,9 +60,9 @@ trait ExportsData
 						$location = $location[$step];
 					}
 
-					$row_data[$header] = $location;
+					$row_data[$header] = '"' . $location . '"';
 				} else {
-					$row_data[$header] = $row[$column];
+					$row_data[$header] = '"' . $row[$column] . '"';
 				}
 			}
 
