@@ -10,11 +10,12 @@
 	"repositories": [
 		{
 			"type": "vcs",
-			"url": "https://github.com/stristr/oauth2-server-laravel.git"
+			"url": "git@gitlab.fuzzhq.com:web-modules/user.git"
 		}
 	],
 	"require": {
 		"php": ">=5.5.0",
+		"fuzz/user": "oauth_refactor-dev",
 		"illuminate/support": "~5.0",
 		"illuminate/routing": "~5.0",
 		"illuminate/pagination": "~5.0",
