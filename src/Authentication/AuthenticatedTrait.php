@@ -5,7 +5,7 @@ namespace Fuzz\ApiServer\Authentication;
 use Fuzz\User\Models\User;
 use Fuzz\ApiServer\Exception\ForbiddenException;
 use League\OAuth2\Server\Exception\InvalidRequestException;
-use LucaDegasperi\OAuth2Server\Facades\AuthorizerFacade as Authorizer;
+use LucaDegasperi\OAuth2Server\Facades\Authorizer;
 
 trait AuthenticatedTrait
 {
