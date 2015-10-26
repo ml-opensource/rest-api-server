@@ -77,16 +77,17 @@ abstract class Controller extends RoutingBaseController
 		if ($data instanceof AbstractPaginator) {
 			$pagination = $this->getPagination($data);
 			$data       = $data->getCollection();
+
+			return $this->getResponder()->send(compact('data', 'pagination'), $status_code, $headers);
 		}
 
-		return $this->getResponder()->send(compact('data', 'pagination'), $status_code, $headers);
+		return $this->getResponder()->send($data, $status_code, $headers);
 	}
 
 	/**
 	 * Created!
 	 *
 	 * @param mixed $data
-	 * @param int   $status_code
 	 * @param array $headers
 	 *
 	 * @return \Illuminate\Http\JsonResponse
