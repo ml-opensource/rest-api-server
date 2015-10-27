@@ -7,6 +7,8 @@
 
 namespace Fuzz\ApiServer\Routing;
 
+use Fuzz\Data\Serialization\FuzzDataArraySerializer;
+use Fuzz\Data\Serialization\FuzzModelTransformer;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Request;
@@ -17,6 +19,10 @@ use Fuzz\ApiServer\Exception\ForbiddenException;
 use Fuzz\ApiServer\Exception\BadRequestException;
 use Fuzz\ApiServer\Exception\NotImplementedException;
 use Illuminate\Routing\Controller as RoutingBaseController;
+use League\Fractal\Manager;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use League\Fractal\Resource\Collection;
+use League\Fractal\Resource\Item;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -310,5 +316,64 @@ abstract class Controller extends RoutingBaseController
 	protected function readArrayParameter($parameter_name)
 	{
 		return array_values(array_filter((array) Input::get($parameter_name)));
+	}
+
+	/**
+	 * Get an instance of the serialization manager
+	 *
+	 * @return \League\Fractal\Manager
+	 */
+	public function serializerManager()
+	{
+		$manager = new Manager;
+		$serializer_class = config('view.data_serializer', FuzzDataArraySerializer::class);
+		$manager->setSerializer(new $serializer_class);
+		return $manager;
+	}
+
+	/**
+	 * Serialize a collection of resources
+	 *
+	 * @param \Illuminate\Pagination\AbstractPaginator|array $data
+	 * @param string|callable $transformer
+	 * @return array
+	 */
+	public function serializeCollection($data, $transformer = FuzzModelTransformer::class)
+	{
+		$manager = $this->serializerManager();
+
+		$collection = $data;
+
+		// Transformers can be a class namespace string or a callable closure
+		$transformer = is_callable($transformer) ? $transformer : new $transformer;
+
+		if ($data instanceof AbstractPaginator) {
+			$collection = $data->getCollection();
+			$resource = new Collection($collection, $transformer, Route::currentRouteName());
+			$resource->setPaginator(new IlluminatePaginatorAdapter($data));
+		} else {
+			$resource = new Collection($collection, $transformer, Route::currentRouteName());
+		}
+
+		return $manager->createData($resource)->toArray();
+	}
+
+	/**
+	 * Serialize a single resource
+	 *
+	 * @param \Fuzz\MagicBox\Contracts\Repository|array $data
+	 * @param string|callable $transformer
+	 * @return array
+	 */
+	public function serialize($data, $transformer = FuzzModelTransformer::class)
+	{
+		$manager = $this->serializerManager();
+
+		// Transformers can be a class namespace string or a callable closure
+		$transformer = is_callable($transformer) ? $transformer : new $transformer;
+
+		$resource = new Item($data, $transformer, Route::currentRouteName());
+
+		return $manager->createData($resource)->toArray();
 	}
 }
