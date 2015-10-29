@@ -7,23 +7,17 @@
 
 namespace Fuzz\ApiServer\Routing;
 
-use Fuzz\Data\Serialization\FuzzDataArraySerializer;
-use Fuzz\Data\Serialization\FuzzModelTransformer;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Pagination\AbstractPaginator;
+use Symfony\Component\HttpFoundation\Response;
 use Fuzz\ApiServer\Exception\ConflictException;
 use Fuzz\ApiServer\Exception\NotFoundException;
 use Fuzz\ApiServer\Exception\ForbiddenException;
 use Fuzz\ApiServer\Exception\BadRequestException;
 use Fuzz\ApiServer\Exception\NotImplementedException;
 use Illuminate\Routing\Controller as RoutingBaseController;
-use League\Fractal\Manager;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-use League\Fractal\Resource\Collection;
-use League\Fractal\Resource\Item;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * API Base Controller class.
@@ -71,13 +65,14 @@ abstract class Controller extends RoutingBaseController
 	/**
 	 * Success!
 	 *
-	 * @param mixed $data
-	 * @param int   $status_code
-	 * @param array $headers
+	 * @param mixed  $data
+	 * @param int    $status_code
+	 * @param array  $headers
+	 * @param string $format
 	 *
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	protected function succeed($data, $status_code = Response::HTTP_OK, $headers = [])
+	protected function succeed($data, $status_code = Response::HTTP_OK, $headers = [], $format = 'json')
 	{
 		// Append pagination data automatically
 		if ($data instanceof AbstractPaginator) {
@@ -87,20 +82,21 @@ abstract class Controller extends RoutingBaseController
 			return $this->getResponder()->send(compact('data', 'pagination'), $status_code, $headers);
 		}
 
-		return $this->getResponder()->send($data, $status_code, $headers);
+		return $this->getResponder()->send($data, $status_code, $headers, $format === 'json');
 	}
 
 	/**
 	 * Created!
 	 *
-	 * @param mixed $data
-	 * @param array $headers
+	 * @param mixed  $data
+	 * @param array  $headers
 	 *
+	 * @param string $format
 	 * @return \Illuminate\Http\JsonResponse
 	 */
-	protected function created($data, $headers = [])
+	protected function created($data, $headers = [], $format = 'json')
 	{
-		return $this->succeed($data, Response::HTTP_CREATED, $headers);
+		return $this->succeed($data, Response::HTTP_CREATED, $headers, $format);
 	}
 
 	/**
@@ -236,6 +232,7 @@ abstract class Controller extends RoutingBaseController
 	 *
 	 * @param  AbstractPaginator $paginator
 	 * @return array
+	 * @todo this may be useless with the serializer
 	 */
 	final private function getPagination(AbstractPaginator $paginator)
 	{
@@ -311,69 +308,11 @@ abstract class Controller extends RoutingBaseController
 	/**
 	 * Read an array parameter.
 	 *
+	 * @param $parameter_name
 	 * @return array
 	 */
 	protected function readArrayParameter($parameter_name)
 	{
 		return array_values(array_filter((array) Input::get($parameter_name)));
-	}
-
-	/**
-	 * Get an instance of the serialization manager
-	 *
-	 * @return \League\Fractal\Manager
-	 */
-	public function serializerManager()
-	{
-		$manager = new Manager;
-		$serializer_class = config('view.data_serializer', FuzzDataArraySerializer::class);
-		$manager->setSerializer(new $serializer_class);
-		return $manager;
-	}
-
-	/**
-	 * Serialize a collection of resources
-	 *
-	 * @param \Illuminate\Pagination\AbstractPaginator|array $data
-	 * @param string|callable $transformer
-	 * @return array
-	 */
-	public function serializeCollection($data, $transformer = FuzzModelTransformer::class)
-	{
-		$manager = $this->serializerManager();
-
-		$collection = $data;
-
-		// Transformers can be a class namespace string or a callable closure
-		$transformer = is_callable($transformer) ? $transformer : new $transformer;
-
-		if ($data instanceof AbstractPaginator) {
-			$collection = $data->getCollection();
-			$resource = new Collection($collection, $transformer, Route::currentRouteName());
-			$resource->setPaginator(new IlluminatePaginatorAdapter($data));
-		} else {
-			$resource = new Collection($collection, $transformer, Route::currentRouteName());
-		}
-
-		return $manager->createData($resource)->toArray();
-	}
-
-	/**
-	 * Serialize a single resource
-	 *
-	 * @param \Fuzz\MagicBox\Contracts\Repository|array $data
-	 * @param string|callable $transformer
-	 * @return array
-	 */
-	public function serialize($data, $transformer = FuzzModelTransformer::class)
-	{
-		$manager = $this->serializerManager();
-
-		// Transformers can be a class namespace string or a callable closure
-		$transformer = is_callable($transformer) ? $transformer : new $transformer;
-
-		$resource = new Item($data, $transformer, Route::currentRouteName());
-
-		return $manager->createData($resource)->toArray();
 	}
 }
