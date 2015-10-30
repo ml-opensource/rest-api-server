@@ -2,6 +2,7 @@
 
 namespace Fuzz\ApiServer\Utility;
 
+use Carbon\Carbon;
 use League\Csv\Writer;
 use SplTempFileObject;
 use League\Fractal\Manager;
@@ -103,8 +104,9 @@ trait SerializesData
 		}
 
 		$csv->insertAll($rows);
-		$csv->output('export.csv');
-		die; // @todo this works, but should this be valid?
+		$csv->output(Carbon::now()->toDateTimeString() . config('app.timezone')  .'-export.csv');
+		// End processing and dump the file stream to a response. There is most likely a better solution.
+		die;
 	}
 
 	/**
