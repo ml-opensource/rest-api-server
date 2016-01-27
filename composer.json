@@ -7,12 +7,12 @@
 			"email": "fuzzweb@fuzzproductions.com"
 		}
 	],
-	"repositories": [
-		{
+	"repositories": {
+		"user": {
 			"type": "vcs",
 			"url": "git@gitlab.fuzzhq.com:web-modules/user.git"
 		}
-	],
+	},
 	"require": {
 		"php": ">=5.5.0",
 		"fuzz/user": "3.0.x-dev",
