@@ -21,7 +21,7 @@
 		"illuminate/pagination": "~5.0",
 		"illuminate/database": "~5.0",
 		"illuminate/http": "~5.0",
-		"lucadegasperi/oauth2-server-laravel": "5.0.x",
+		"lucadegasperi/oauth2-server-laravel": "5.1.x",
 		"league/fractal": "^0.13.0@dev"
 	},
 	"autoload": {
