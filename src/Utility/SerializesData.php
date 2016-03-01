@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\Route;
 use League\Fractal\Resource\Collection;
 use Illuminate\Pagination\AbstractPaginator;
 use League\Fractal\Resource\ResourceInterface;
-use Fuzz\ApiServer\Exception\BadRequestException;
 use Fuzz\Data\Serialization\FuzzModelTransformer;
 use Fuzz\Data\Serialization\FuzzDataArraySerializer;
 use Fuzz\Data\Serialization\FuzzCsvDataArraySerializer;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class SerializesData
@@ -31,33 +31,39 @@ trait SerializesData
 	 */
 	public $export_formats = [
 		'json' => 'formatJsonResponse',
-		'csv' => 'formatCsvResponse',
+		'csv'  => 'formatCsvResponse',
 	];
 
 	/**
 	 * Get an instance of the serialization manager
 	 *
 	 * @param $format
+	 * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
 	 * @return \League\Fractal\Manager
-	 * @throws \Fuzz\ApiServer\Exception\BadRequestException
 	 */
 	public function serializerManager($format)
 	{
 		if (! $this->isValidFormat($format)) {
-			throw new BadRequestException('The requested format is invalid');
+			throw new BadRequestHttpException('The requested format is invalid.');
 		}
 
-		$manager = new Manager;
-		$path = ['view', 'serialization', $format, 'serializer'];
-		$serializer_class = config(implode('.', $path) , FuzzDataArraySerializer::class);
+		$manager          = new Manager;
+		$path             = [
+			'view',
+			'serialization',
+			$format,
+			'serializer',
+		];
+		$serializer_class = config(implode('.', $path), FuzzDataArraySerializer::class);
 		$manager->setSerializer(new $serializer_class);
+
 		return $manager;
 	}
 
 	/**
 	 * Determine the appropriate data transformer
 	 *
-	 * @param mixed $transformer
+	 * @param mixed  $transformer
 	 * @param string $format
 	 *
 	 * @return callable|object
@@ -65,8 +71,14 @@ trait SerializesData
 	public function findTransformer($transformer, $format)
 	{
 		if ($format === 'csv') {
-			$path = ['view', 'serialization', $format, 'transformer'];
+			$path  = [
+				'view',
+				'serialization',
+				$format,
+				'transformer',
+			];
 			$class = config(implode('.', $path), FuzzCsvDataArraySerializer::class);
+
 			return new $class;
 		}
 
@@ -97,14 +109,14 @@ trait SerializesData
 	public function formatCsvResponse(Manager $manager, ResourceInterface $resource)
 	{
 		$rows = $manager->createData($resource)->toArray();
-		$csv = Writer::createFromFileObject(new SplTempFileObject());
+		$csv  = Writer::createFromFileObject(new SplTempFileObject());
 
 		if (array_key_exists('meta', $rows)) {
 			unset($rows['meta']);
 		}
 
 		$csv->insertAll($rows);
-		$csv->output(Carbon::now()->toDateTimeString() . config('app.timezone')  .'-export.csv');
+		$csv->output(Carbon::now()->toDateTimeString() . config('app.timezone') . '-export.csv');
 		// End processing and dump the file stream to a response. There is most likely a better solution.
 		die;
 	}
@@ -116,7 +128,6 @@ trait SerializesData
 	 * @param callable|string                                $transformer
 	 * @param string                                         $format
 	 * @return array
-	 * @throws \Fuzz\ApiServer\Exception\BadRequestException
 	 */
 	public function serializeCollection($data, $transformer = FuzzModelTransformer::class, $format = 'json')
 	{
@@ -129,24 +140,24 @@ trait SerializesData
 
 		if ($data instanceof AbstractPaginator) {
 			$collection = $data->getCollection();
-			$resource = new Collection($collection, $transformer, Route::currentRouteName());
+			$resource   = new Collection($collection, $transformer, Route::currentRouteName());
 			$resource->setPaginator(new IlluminatePaginatorAdapter($data));
 		} else {
 			$resource = new Collection($collection, $transformer, Route::currentRouteName());
 		}
 
 		$response_formatter = $this->export_formats[$format];
+
 		return $this->$response_formatter($manager, $resource);
 	}
 
 	/**
 	 * Serialize a single resource
 	 *
-	 * @param \Fuzz\MagicBox\Contracts\Repository|array $data
-	 * @param callable|string                           $transformer
-	 * @param string                                    $format
+	 * @param mixed           $data
+	 * @param callable|string $transformer
+	 * @param string          $format
 	 * @return array
-	 * @throws \Fuzz\ApiServer\Exception\BadRequestException
 	 */
 	public function serialize($data, $transformer = FuzzModelTransformer::class, $format = 'json')
 	{
@@ -158,6 +169,7 @@ trait SerializesData
 		$resource = new Item($data, $transformer, Route::currentRouteName());
 
 		$response_formatter = $this->export_formats[$format];
+
 		return $this->$response_formatter($manager, $resource);
 	}
 

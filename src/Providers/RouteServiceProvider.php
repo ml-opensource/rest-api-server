@@ -3,7 +3,6 @@
 namespace Fuzz\ApiServer\Providers;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
-use Illuminate\Http\JsonResponse;
 
 class RouteServiceProvider extends ServiceProvider
 {

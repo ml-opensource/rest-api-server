@@ -2,7 +2,7 @@
 
 namespace Fuzz\ApiServer\Validation;
 
-use Fuzz\ApiServer\Exception\BadRequestException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 trait ValidatesInput
 {
@@ -12,14 +12,14 @@ trait ValidatesInput
 	 * @param array  $input
 	 * @param  array $rules
 	 * @param  array $messages
-	 * @throws \Fuzz\ApiServer\Exception\BadRequestException
+	 * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
 	 */
 	public function validate(array $input, array $rules, array $messages = [])
 	{
 		$validator = $this->getValidationFactory()->make($input, $rules, $messages);
 
 		if ($validator->fails()) {
-			throw new BadRequestException('Request validation failed.', $validator->errors()->getMessages());
+			throw new BadRequestHttpException('Request validation failed.', $validator->errors()->getMessages());
 		}
 	}
 

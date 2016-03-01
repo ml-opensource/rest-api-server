@@ -12,12 +12,11 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Pagination\AbstractPaginator;
 use Symfony\Component\HttpFoundation\Response;
-use Fuzz\ApiServer\Exception\ConflictException;
-use Fuzz\ApiServer\Exception\NotFoundException;
-use Fuzz\ApiServer\Exception\ForbiddenException;
-use Fuzz\ApiServer\Exception\BadRequestException;
-use Fuzz\ApiServer\Exception\NotImplementedException;
 use Illuminate\Routing\Controller as RoutingBaseController;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * API Base Controller class.
@@ -104,12 +103,12 @@ abstract class Controller extends RoutingBaseController
 	 *
 	 * @param string $message
 	 * @param mixed  $data
-	 * @throws \Fuzz\ApiServer\Exception\NotFoundException
+	 * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
 	 * @return void
 	 */
 	protected function notFound($message = null, $data = null)
 	{
-		throw new NotFoundException($message, $data);
+		throw new NotFoundHttpException($message, $data);
 	}
 
 	/**
@@ -117,36 +116,24 @@ abstract class Controller extends RoutingBaseController
 	 *
 	 * @param string $message
 	 * @param mixed  $data
-	 * @throws \Fuzz\ApiServer\Exception\ForbiddenException
+	 * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
 	 * @return void
 	 */
 	protected function forbidden($message = null, $data = null)
 	{
-		throw new ForbiddenException($message, $data);
+		throw new AccessDeniedHttpException($message, $data);
 	}
 
 	/**
 	 * Bad request.
 	 *
 	 * @param string $message
-	 * @throws \Fuzz\ApiServer\Exception\BadRequestException
+	 * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
 	 * @return void
 	 */
 	protected function badRequest($message = null, $data = null)
 	{
-		throw new BadRequestException($message, $data);
-	}
-
-	/**
-	 * Not implemented.
-	 *
-	 * @param string $message
-	 * @throws \Fuzz\ApiServer\Exception\NotImplementedException
-	 * @return void
-	 */
-	protected function notImplemented($message = null, $data = null)
-	{
-		throw new NotImplementedException($message, $data);
+		throw new BadRequestHttpException($message, $data);
 	}
 
 	/**
@@ -154,12 +141,12 @@ abstract class Controller extends RoutingBaseController
 	 *
 	 * @param string $message
 	 * @param string $data
-	 * @throws \Fuzz\ApiServer\Exception\ConflictException
+	 * @throws \Symfony\Component\HttpKernel\Exception\ConflictHttpException
 	 * @return void
 	 */
 	protected function conflict($message = null, $data = null)
 	{
-		throw new ConflictException($message, $data);
+		throw new ConflictHttpException($message, $data);
 	}
 
 	/**
@@ -220,6 +207,7 @@ abstract class Controller extends RoutingBaseController
 	/**
 	 * Returns the value of the pagination "per page" parameter.
 	 *
+	 * @param int $default
 	 * @return int
 	 */
 	public static function getPerPage($default = self::PAGINATION_PER_PAGE_DEFAULT)
@@ -241,7 +229,7 @@ abstract class Controller extends RoutingBaseController
 			array_except(
 				Request::instance()->query->all(), [
 					self::PAGINATION_CURRENT_PAGE,
-					self::PAGINATION_PER_PAGE
+					self::PAGINATION_PER_PAGE,
 				]
 			) as $key => $value
 		) {
@@ -265,7 +253,6 @@ abstract class Controller extends RoutingBaseController
 	 * Require a set of parameters.
 	 *
 	 * @return array
-	 * @throws BadRequestException
 	 * @todo reimplement as validation middleware
 	 */
 	protected function requireParameters()

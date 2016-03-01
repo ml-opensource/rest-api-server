@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\Response;
 use League\OAuth2\Server\Exception\OAuthException;
-use Fuzz\ApiServer\Exception\OAuthException as FuzzOAuthException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Responder
 {
@@ -51,8 +51,6 @@ class Responder
 			$error_description = $exception->getMessage();
 			$status_code       = $exception->httpStatusCode;
 			$headers           = $exception->getHttpHeaders();
-
-			$error_data = ($exception instanceof FuzzOAuthException) ? $exception->errorData : null;
 		} else {
 			/**
 			 * Contextualize response with verbose information outside production.
@@ -70,9 +68,13 @@ class Responder
 				];
 			}
 
-			$status_code = Response::HTTP_INTERNAL_SERVER_ERROR;
-
-			$headers = [];
+			if ($exception instanceof HttpException) {
+				$status_code = $exception->getStatusCode();
+				$headers = $exception->getHeaders();
+			} else {
+				$status_code = Response::HTTP_INTERNAL_SERVER_ERROR;
+				$headers = [];
+			}
 		}
 
 		return $this->send(
