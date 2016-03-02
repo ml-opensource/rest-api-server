@@ -2,20 +2,15 @@
 
 namespace Fuzz\ApiServer\Routing;
 
-use Fuzz\Auth\Policies\ChecksGatePolicies;
-use Fuzz\Auth\Policies\RepositoryModelPolicyInterface;
-use Fuzz\MagicBox\Utility\ChecksRelations;
 use Illuminate\Http\Request;
-
-use Fuzz\Auth\Models\AgentInterface;
-//use Fuzz\Agency\Contracts\Resource;
-use Illuminate\Support\Facades\Auth;
 use Fuzz\MagicBox\Contracts\Repository;
+use Fuzz\Auth\Policies\ChecksGatePolicies;
+use Fuzz\MagicBox\Utility\ChecksRelations;
 use Fuzz\ApiServer\Utility\SerializesData;
+use Fuzz\MagicBox\Contracts\MagicBoxResource;
 use Fuzz\Data\Serialization\FuzzModelTransformer;
 use Fuzz\Data\Serialization\FuzzArrayTransformer;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Fuzz\MagicBox\Contracts\MagicBoxResource;
+use Fuzz\Auth\Policies\RepositoryModelPolicyInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -35,7 +30,24 @@ class ResourceController extends Controller
 	 */
 	const DEFAULT_FORMAT = 'json';
 
-	public $policy;
+	/**
+	 * ResourceController constructor.
+	 *
+	 * @param \Fuzz\MagicBox\Contracts\Repository $repository
+	 */
+	public function __construct(Repository $repository)
+	{
+		$model_class        = $repository->getModelClass();
+		$this->policy_class = $model_class;
+
+		// Laravel will throw an InvalidArgumentException if a policy is not defined. We require a policy to be
+		// defined for every resource.
+		$policy = $this->policy();
+
+		if (! ($policy instanceof RepositoryModelPolicyInterface)) {
+			throw new \LogicException('Controller ' . get_class($policy) . ' does not implement ' . RepositoryModelPolicyInterface::class . '.');
+		}
+	}
 
 	/**
 	 * Display a listing of the resource.
@@ -46,14 +58,12 @@ class ResourceController extends Controller
 	 */
 	public function index(Repository $repository, Request $request)
 	{
-		$agent = Auth::user();
-
-		$this->checkAndApplyPolicy(__FUNCTION__, $repository, $agent);
+		$this->checkAndApplyPolicy(__FUNCTION__, $repository);
 
 		$model_class = $repository->getModelClass();
 
 		// @todo needs to be better
-		if ($request->get('paginate', 'true') === 'false' && method_exists($agent, 'canRequestUnpaginatedIndex') && $agent->canRequestUnpaginatedIndex()) {
+		if ($request->get('paginate', 'true') === 'false' && $this->policy()->unpaginatedIndex($repository)) {
 			$paginator = $repository->all();
 		} else {
 			$paginator = $repository->paginate($this->getPerPage());
@@ -78,9 +88,7 @@ class ResourceController extends Controller
 			throw new BadRequestHttpException('You cannot create a resource with an id.', ['id' => [sprintf('You cannot create a resource with an id.')]]);
 		}
 
-		$agent = Auth::user();
-
-		$this->checkAndApplyPolicy(__FUNCTION__, $repository, $agent);
+		$this->checkAndApplyPolicy(__FUNCTION__, $repository);
 
 		$created = $repository->create();
 
@@ -99,9 +107,7 @@ class ResourceController extends Controller
 	 */
 	public function show(Repository $repository, Request $request)
 	{
-		$agent = Auth::user();
-
-		$this->checkAndApplyPolicy(__FUNCTION__, $repository, $agent);
+		$this->checkAndApplyPolicy(__FUNCTION__, $repository);
 
 		$resource = $repository->read();
 
@@ -120,9 +126,7 @@ class ResourceController extends Controller
 	 */
 	public function update(Repository $repository, Request $request)
 	{
-		$agent = Auth::user();
-
-		$this->checkAndApplyPolicy(__FUNCTION__, $repository, $agent);
+		$this->checkAndApplyPolicy(__FUNCTION__, $repository);
 
 		$resource = $repository->save();
 
@@ -140,9 +144,7 @@ class ResourceController extends Controller
 	 */
 	public function destroy(Repository $repository, Request $request)
 	{
-		$agent = Auth::user();
-
-		$this->checkAndApplyPolicy(__FUNCTION__, $repository, $agent);
+		$this->checkAndApplyPolicy(__FUNCTION__, $repository);
 
 		$serialized = $this->serialize(['status' => $repository->delete()], FuzzArrayTransformer::class, $request->get('format', self::DEFAULT_FORMAT));
 
@@ -154,12 +156,11 @@ class ResourceController extends Controller
 	 *
 	 * @param string                              $action
 	 * @param \Fuzz\MagicBox\Contracts\Repository $repository
-	 * @param \Fuzz\Auth\Models\AgentInterface    $agent
 	 * @return bool
 	 */
-	public function checkAndApplyPolicy($action, Repository $repository, AgentInterface $agent)
+	public function checkAndApplyPolicy($action, Repository $repository)
 	{
-		if (! $this->policy()->{$action}($agent, $repository)) {
+		if (! $this->policy()->{$action}($repository)) { // @todo fix
 			throw new AccessDeniedHttpException;
 		}
 
@@ -182,7 +183,7 @@ class ResourceController extends Controller
 			return true;
 		}
 
-		$this->validateCascadingRelations($instance, $agent, $input, $repository);
+		$this->validateCascadingRelations($instance, $input, $repository);
 
 		$repository->setInput($input);
 
@@ -192,13 +193,12 @@ class ResourceController extends Controller
 	/**
 	 * Validate cascading relations are not violated by nested rules.
 	 *
-	 * @param \Fuzz\MagicBox\Contracts\MagicBoxResource $model
-	 * @param \Fuzz\Auth\Models\AgentInterface          $agent
-	 * @param array                                     $input
-	 * @param \Fuzz\MagicBox\Contracts\Repository       $repository
+	 * @param \Fuzz\MagicBox\Contracts\MagicBoxResource|\Illuminate\Database\Eloquent\Model $model
+	 * @param array                                                                         $input
+	 * @param \Fuzz\MagicBox\Contracts\Repository                                           $repository
 	 * @todo support more relationship types, such as polymorphic ones!
 	 */
-	public function validateCascadingRelations(MagicBoxResource $model, AgentInterface $agent, &$input, Repository $repository)
+	public function validateCascadingRelations(MagicBoxResource $model, &$input, Repository $repository)
 	{
 		foreach ($input as $key => &$value) {
 			// Scalar values can be skipped
@@ -227,12 +227,12 @@ class ResourceController extends Controller
 				case 'HasMany':
 				case 'BelongsToMany':
 					foreach ($value as $subkey => &$subvalue) {
-						$this->checkRelatedAclFromInput($related, $agent, $subvalue, $repository, $model);
+						$this->checkRelatedAclFromInput($related, $subvalue, $repository, $model);
 					}
 					break;
 				case 'HasOne':
 				case 'BelongsTo':
-					$this->checkRelatedAclFromInput($related, $agent, $value, $repository, $model);
+					$this->checkRelatedAclFromInput($related, $value, $repository, $model);
 					break;
 				default:
 					unset($input[$key]);
@@ -244,13 +244,12 @@ class ResourceController extends Controller
 	/**
 	 * Check relationship ACL values for simple insert/update abilities.
 	 *
-	 * @param \Fuzz\MagicBox\Contracts\MagicBoxResource $related
-	 * @param \Fuzz\Auth\Models\AgentInterface          $agent
-	 * @param array                                     $input
-	 * @param \Fuzz\MagicBox\Contracts\Repository       $repository
-	 * @param \Fuzz\MagicBox\Contracts\MagicBoxResource $parent
+	 * @param \Fuzz\MagicBox\Contracts\MagicBoxResource|\Illuminate\Database\Eloquent\Model $related
+	 * @param array                                                                         $input
+	 * @param \Fuzz\MagicBox\Contracts\Repository                                           $repository
+	 * @param \Fuzz\MagicBox\Contracts\MagicBoxResource|\Illuminate\Database\Eloquent\Model $parent
 	 */
-	public function checkRelatedAclFromInput(MagicBoxResource $related, AgentInterface $agent, &$input, Repository $repository, MagicBoxResource $parent)
+	public function checkRelatedAclFromInput(MagicBoxResource $related, &$input, Repository $repository, MagicBoxResource $parent)
 	{
 		$key_name = $related->getKeyName();
 
@@ -260,14 +259,14 @@ class ResourceController extends Controller
 		if (isset($input[$key_name])) {
 			$related_model_class = get_class($related);
 			$related             = $related_model_class::findOrFail($input[$key_name]);
-			if (! $policy->updateNested($agent, $repository, $related, $parent, $input)) {
+			if (! $policy->updateNested($repository, $related, $parent, $input)) {
 				$input = array_only($input, [$key_name]);
 			}
-		} elseif (! $policy->storeNested($agent, $repository, $related, $parent, $input)) {
+		} elseif (! $policy->storeNested($repository, $related, $parent, $input)) {
 			throw new AccessDeniedHttpException;
 		}
 
-		$this->validateCascadingRelations($related, $agent, $input, $repository);
+		$this->validateCascadingRelations($related, $input, $repository);
 	}
 
 	/**
