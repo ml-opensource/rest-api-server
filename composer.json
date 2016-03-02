@@ -23,7 +23,7 @@
 	},
 	"require": {
 		"php": ">=5.5.0",
-		"fuzz/laravel-data": "3.0.x-dev",
+		"fuzz/laravel-data": "3.2.x-dev",
 		"fuzz/laravel-oauth": "dev-master",
 		"fuzz/magic-box": "dev-refactor_less_dependent_on_fuzz_modules",
 		"laravel/framework": "5.2.*",
