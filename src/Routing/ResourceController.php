@@ -103,7 +103,6 @@ class ResourceController extends Controller
 	 * @param \Fuzz\MagicBox\Contracts\Repository $repository
 	 * @param \Illuminate\Http\Request            $request
 	 * @return \Illuminate\Http\JsonResponse
-	 * @throws \Fuzz\ApiServer\Exception\ForbiddenException
 	 */
 	public function show(Repository $repository, Request $request)
 	{
@@ -122,7 +121,6 @@ class ResourceController extends Controller
 	 * @param \Fuzz\MagicBox\Contracts\Repository $repository
 	 * @param \Illuminate\Http\Request            $request
 	 * @return \Illuminate\Http\JsonResponse
-	 * @throws \Fuzz\ApiServer\Exception\ForbiddenException
 	 */
 	public function update(Repository $repository, Request $request)
 	{
