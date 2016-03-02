@@ -249,14 +249,14 @@ class ResourceController extends Controller
 	 */
 	public function checkRelatedAclFromInput(MagicBoxResource $related, &$input, Repository $repository, MagicBoxResource $parent)
 	{
-		$key_name = $related->getKeyName();
+		$key_name            = $related->getKeyName();
+		$related_model_class = get_class($related);
 
 		/** @var \Fuzz\Auth\Policies\RepositoryModelPolicyInterface $policy */
-		$policy = policy(get_class($related));
+		$policy = policy($related_model_class);
 
 		if (isset($input[$key_name])) {
-			$related_model_class = get_class($related);
-			$related             = $related_model_class::findOrFail($input[$key_name]);
+			$related = $related_model_class::findOrFail($input[$key_name]);
 			if (! $policy->updateNested($repository, $related, $parent, $input)) {
 				$input = array_only($input, [$key_name]);
 			}
