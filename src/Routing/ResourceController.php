@@ -44,7 +44,7 @@ class ResourceController extends Controller
 		$policy = $this->setPolicyClass($model_class);
 
 		if (! ($policy instanceof RepositoryModelPolicyInterface)) {
-			throw new \LogicException('Controller ' . get_class($policy) . ' does not implement ' . RepositoryModelPolicyInterface::class . '.');
+			throw new \LogicException(get_class($policy) . ' does not implement ' . RepositoryModelPolicyInterface::class . '.');
 		}
 	}
 
