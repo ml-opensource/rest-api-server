@@ -181,7 +181,7 @@ Handles nested JSON and form properties just fine:
 ```
 
 ### CORS Middleware
-Configuring the CORS middleware is as simple as adding `Crub\Http\Middleware\RepositoryMiddleware` to the `$middleware` array in `app/Http/Kernel.php`.
+Configuring the CORS middleware is as simple as adding `Fuzz\ApiServer\Routing\CorsMiddleware` to the `$middleware` array in `app/Http/Kernel.php`.
 
 ## Serializing Data
 `fuzz/api-server` wraps [league/fractal](http://fractal.thephpleague.com/) to serialize data output. `Fuzz\ApiServer\Routing\ResourceController` uses the `Fuzz\ApiServer\Utility\SerializesData` trait so any ResourceController extending it will do so as well. You can use serialization in any controller by including the trait and using it's methods.
