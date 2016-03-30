@@ -5,6 +5,7 @@ namespace Fuzz\ApiServer\Routing;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Contracts\Support\Arrayable;
+use ReflectionClass;
 use Symfony\Component\HttpFoundation\Response;
 use League\OAuth2\Server\Exception\OAuthException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -51,6 +52,11 @@ class Responder
 			$error_description = $exception->getMessage();
 			$status_code       = $exception->httpStatusCode;
 			$headers           = $exception->getHttpHeaders();
+		} elseif ($exception instanceof HttpException) {
+			$error             = snake_case(class_basename($exception));
+			$error_description = $exception->getMessage();
+			$status_code       = $exception->getStatusCode();
+			$headers           = $exception->getHeaders();
 		} else {
 			/**
 			 * Contextualize response with verbose information outside production.
