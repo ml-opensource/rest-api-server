@@ -11,6 +11,7 @@ use Fuzz\MagicBox\Contracts\MagicBoxResource;
 use Fuzz\Data\Serialization\FuzzModelTransformer;
 use Fuzz\Data\Serialization\FuzzArrayTransformer;
 use Fuzz\Auth\Policies\RepositoryModelPolicyInterface;
+use LucaDegasperi\OAuth2Server\Exceptions\NoActiveAccessTokenException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -157,8 +158,12 @@ class ResourceController extends Controller
 	 */
 	public function checkAndApplyPolicy($action, Repository $repository)
 	{
-		if (! $this->policy()->{$action}($repository)) { // @todo fix
-			throw new AccessDeniedHttpException;
+		try {
+			if (! $this->policy()->{$action}($repository)) { // @todo fix
+				throw new AccessDeniedHttpException('Access denied.');
+			}
+		} catch (NoActiveAccessTokenException $exception) {
+			throw new AccessDeniedHttpException('Access denied.');
 		}
 
 		$model_class = $repository->getModelClass();
