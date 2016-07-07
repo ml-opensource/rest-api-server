@@ -1,31 +1,18 @@
 {
 	"name": "fuzz/api-server",
-	"description": "",
+	"description": "A framework for rapid REST API development.",
+	"license": "MIT",
 	"authors": [
 		{
 			"name": "Fuzz Productions",
 			"email": "fuzzweb@fuzzproductions.com"
 		}
 	],
-	"repositories": {
-		"laravel-data": {
-			"type": "vcs",
-			"url": "git@gitlab.fuzzhq.com:web-modules/laravel-data.git"
-		},
-		"laravel-oauth": {
-			"type": "vcs",
-			"url": "git@gitlab.fuzzhq.com:web-modules/laravel-oauth.git"
-		},
-		"magic-box": {
-			"type": "vcs",
-			"url": "git@gitlab.fuzzhq.com:web-modules/magic-box.git"
-		}
-	},
 	"require": {
 		"php": ">=5.5.0",
-		"fuzz/laravel-data": "3.2.x-dev",
-		"fuzz/laravel-oauth": "dev-master",
-		"fuzz/magic-box": "dev-refactor_less_dependent_on_fuzz_modules",
+		"fuzz/laravel-data": "1.0.*",
+		"fuzz/laravel-oauth": "1.0.*",
+		"fuzz/magic-box": "1.1.*",
 		"laravel/framework": "5.2.*",
 		"league/csv": "^7.2@dev",
 		"lucadegasperi/oauth2-server-laravel": "5.1.*",

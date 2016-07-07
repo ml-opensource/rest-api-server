@@ -1,7 +1,7 @@
 Laravel API Server
 ==================
 
-A RESTful framework for rapid API development.
+A framework for rapid REST API development.
 
 ### Installation
 1. Require the repository in your `composer.json`
