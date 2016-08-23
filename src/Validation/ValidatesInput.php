@@ -19,7 +19,7 @@ trait ValidatesInput
 		$validator = $this->getValidationFactory()->make($input, $rules, $messages);
 
 		if ($validator->fails()) {
-			throw new BadRequestHttpException('Request validation failed.', $validator->errors()->getMessages());
+			throw new BadRequestHttpException('Request validation failed, see supporting documentation for information on properly formatting the request.');
 		}
 	}
 
