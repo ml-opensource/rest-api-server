@@ -75,5 +75,6 @@ class CorsMiddleware
 		$vary_headers   = array_filter(explode(', ', $request->header('Vary')));
 		$vary_headers[] = 'Origin';
 		$response->headers->set('Vary', implode(', ', array_unique($vary_headers)));
+		$response->headers->set('Access-Control-Allow-Origin', '*');
 	}
 }
