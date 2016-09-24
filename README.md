@@ -1,4 +1,4 @@
-Laravel API Server
+Laravel API Server [![Slack Status](https://fuzz-opensource.herokuapp.com/badge.svg)](https://fuzz-opensource.herokuapp.com/)
 ==================
 
 A framework for rapid REST API development.
