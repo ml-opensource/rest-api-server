@@ -11,11 +11,11 @@
 	"require": {
 		"php": ">=5.5.0",
 		"fuzz/laravel-data": "1.0.*",
-		"fuzz/laravel-oauth": "1.0.*",
-		"fuzz/magic-box": "1.1.*",
-		"laravel/framework": "5.2.*",
+		"fuzz/laravel-oauth": "dev-feature_support_laravel_53",
+		"fuzz/magic-box": "dev-feature_support_laravel_53",
+		"laravel/framework": "5.3.*",
 		"league/csv": "^7.2@dev",
-		"lucadegasperi/oauth2-server-laravel": "5.1.*",
+		"lucadegasperi/oauth2-server-laravel": "5.2.*",
 		"league/fractal": "^0.13.0@dev"
 	},
 	"autoload": {
