@@ -32,16 +32,17 @@ class ResourceController extends Controller
 	const DEFAULT_FORMAT = 'json';
 
 	/**
-	 * ResourceController constructor.
+	 * Require a model policy to be present.
+	 *
+	 * Laravel will throw an InvalidArgumentException if a policy is not defined. We require a policy to be
+	 * defined for every resource.
 	 *
 	 * @param \Fuzz\MagicBox\Contracts\Repository $repository
 	 */
-	public function __construct(Repository $repository)
+	public function requirePolicy(Repository $repository)
 	{
 		$model_class = $repository->getModelClass();
 
-		// Laravel will throw an InvalidArgumentException if a policy is not defined. We require a policy to be
-		// defined for every resource.
 		$policy = $this->setPolicyClass($model_class);
 
 		if (! ($policy instanceof RepositoryModelPolicyInterface)) {
@@ -158,6 +159,8 @@ class ResourceController extends Controller
 	 */
 	public function checkAndApplyPolicy($action, Repository $repository)
 	{
+		$this->requirePolicy($repository);
+
 		try {
 			if (! $this->policy()->{$action}($repository)) { // @todo fix
 				throw new AccessDeniedHttpException('Access denied.');
