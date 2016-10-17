@@ -55,6 +55,7 @@ class Responder
 		} elseif ($exception instanceof HttpException) {
 			$error             = snake_case(class_basename($exception));
 			$error_description = $exception->getMessage();
+			$error_formatted   = $exception->getErrorFormatted();
 			$status_code       = $exception->getStatusCode();
 			$headers           = $exception->getHeaders();
 			$error_data        = $exception->getErrorData();
@@ -85,7 +86,7 @@ class Responder
 		}
 
 		return $this->send(
-			compact('error', 'error_description', 'error_data'), $status_code, $headers
+			compact('error', 'error_description', 'error_formatted', 'error_data'), $status_code, $headers
 		);
 	}
 }
