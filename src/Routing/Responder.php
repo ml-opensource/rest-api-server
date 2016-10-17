@@ -53,7 +53,7 @@ class Responder
 			$status_code       = $exception->httpStatusCode;
 			$headers           = $exception->getHttpHeaders();
 		} elseif ($exception instanceof HttpException) {
-			$error             = snake_case(class_basename($exception));
+			$error             = $exception->getErrorName();
 			$error_description = $exception->getMessage();
 			$error_formatted   = $exception->getErrorFormatted();
 			$status_code       = $exception->getStatusCode();
