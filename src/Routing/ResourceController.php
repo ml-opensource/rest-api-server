@@ -12,8 +12,8 @@ use Fuzz\Data\Serialization\FuzzModelTransformer;
 use Fuzz\Data\Serialization\FuzzArrayTransformer;
 use Fuzz\Auth\Policies\RepositoryModelPolicyInterface;
 use LucaDegasperi\OAuth2Server\Exceptions\NoActiveAccessTokenException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Fuzz\HttpException\BadRequestHttpException;
+use Fuzz\HttpException\AccessDeniedHttpException;
 
 /**
  * Class ResourceController

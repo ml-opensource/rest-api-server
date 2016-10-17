@@ -15,7 +15,7 @@ use Fuzz\Data\Serialization\FuzzModelTransformer;
 use Fuzz\Data\Serialization\FuzzDataArraySerializer;
 use Fuzz\Data\Serialization\FuzzCsvDataArraySerializer;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Fuzz\HttpException\BadRequestHttpException;
 
 /**
  * Class SerializesData

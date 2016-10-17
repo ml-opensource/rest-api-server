@@ -6,7 +6,7 @@ use Exception;
 use Fuzz\ApiServer\Routing\Responder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Fuzz\HttpException\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -19,10 +19,11 @@ class Handler extends ExceptionHandler
 	 */
 	public function render($request, Exception $e)
 	{
-		// Recast ModelNotFoundExceptions as local NotFoundExceptions
+		// Recast ModelNotFoundExceptions as local NotFoundHttpExceptions
 		if ($e instanceof ModelNotFoundException) {
+			$model_name = class_basename($e->getModel());
 			$e = new NotFoundHttpException(
-				'Unable to find ' . class_basename($e->getModel()) . '.'
+				"Unable to find $model_name."
 			);
 		}
 

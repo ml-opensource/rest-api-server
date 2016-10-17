@@ -8,7 +8,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use ReflectionClass;
 use Symfony\Component\HttpFoundation\Response;
 use League\OAuth2\Server\Exception\OAuthException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Fuzz\HttpException\HttpException;
 
 class Responder
 {
@@ -57,6 +57,7 @@ class Responder
 			$error_description = $exception->getMessage();
 			$status_code       = $exception->getStatusCode();
 			$headers           = $exception->getHeaders();
+			$error_data        = $exception->getErrorData();
 		} else {
 			/**
 			 * Contextualize response with verbose information outside production.

@@ -13,10 +13,10 @@ use Illuminate\Support\Facades\Request;
 use Illuminate\Pagination\AbstractPaginator;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Routing\Controller as RoutingBaseController;
-use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Fuzz\HttpException\ConflictHttpException;
+use Fuzz\HttpException\NotFoundHttpException;
+use Fuzz\HttpException\BadRequestHttpException;
+use Fuzz\HttpException\AccessDeniedHttpException;
 
 /**
  * API Base Controller class.
@@ -128,8 +128,7 @@ abstract class Controller extends RoutingBaseController
 	 * Bad request.
 	 *
 	 * @param string $message
-	 * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-	 * @return void
+	 * @param mixed  $data
 	 */
 	protected function badRequest($message = null, $data = null)
 	{
