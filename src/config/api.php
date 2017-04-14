@@ -12,5 +12,6 @@ return [
 	'responders' => [
 		'json' => \Fuzz\ApiServer\Response\JsonResponder::class,
 		'csv'  => \Fuzz\ApiServer\Response\CsvResponder::class,
+		'xml'  => \Fuzz\ApiServer\Response\XMLResponder::class,
 	],
 ];

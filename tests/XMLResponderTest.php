@@ -2,13 +2,13 @@
 
 namespace Fuzz\ApiServer\Tests;
 
-use Fuzz\ApiServer\Response\JsonResponder;
+use Fuzz\ApiServer\Response\XMLResponder;
 
-class JsonResponderTest extends TestCase
+class XMLResponderTest extends TestCase
 {
 	public function testItCanSetStatusCode()
 	{
-		$responder = new JsonResponder;
+		$responder = new XMLResponder;
 		$responder->setStatusCode(506);
 
 		$this->assertSame(506, $responder->getResponse()->getStatusCode());
@@ -16,7 +16,7 @@ class JsonResponderTest extends TestCase
 
 	public function testItCanAddHeaders()
 	{
-		$responder = new JsonResponder;
+		$responder = new XMLResponder;
 		$responder->addHeaders([
 			'X-Foo' => 'Fighters'
 		]);
@@ -26,14 +26,12 @@ class JsonResponderTest extends TestCase
 
 	public function testItCanSetData()
 	{
-		$responder = new JsonResponder;
+		$responder = new XMLResponder;
 		$responder->setData([
 			'foo' => 'bar'
 		]);
 
-		$this->assertSame(json_encode([
-			'foo' => 'bar'
-		]), $responder->getResponse()->getContent());
-		$this->assertSame('application/json', $responder->getResponse()->headers->get('Content-Type'));
+		$this->assertSame("<?xml version=\"1.0\"?>\n<root><bar>foo</bar></root>", $responder->getResponse()->getContent());
+		$this->assertSame('application/xml', $responder->getResponse()->headers->get('Content-Type'));
 	}
 }

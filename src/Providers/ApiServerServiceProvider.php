@@ -4,6 +4,7 @@ namespace Fuzz\ApiServer\Providers;
 
 use Fuzz\ApiServer\Response\CsvResponder;
 use Fuzz\ApiServer\Response\JsonResponder;
+use Fuzz\ApiServer\Response\XMLResponder;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Fuzz\ApiServer\Response\ResponseFactory;
 use Illuminate\Support\ServiceProvider;
@@ -37,6 +38,7 @@ class ApiServerServiceProvider extends ServiceProvider
 			return new ResponseFactory(config('api.responders', [
 				'json' => JsonResponder::class,
 				'csv'  => CsvResponder::class,
+				'xml'  => XMLResponder::class,
 			]));
 		});
 	}
