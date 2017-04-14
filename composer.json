@@ -16,8 +16,7 @@
 		"fuzz/http-exception": "1.0.*",
 		"laravel/framework": "5.3.*",
 		"league/csv": "^7.2@dev",
-		"lucadegasperi/oauth2-server-laravel": "5.2.*",
-		"league/fractal": "^0.13.0@dev"
+		"lucadegasperi/oauth2-server-laravel": "5.2.*"
 	},
 	"autoload": {
 		"psr-4": {
