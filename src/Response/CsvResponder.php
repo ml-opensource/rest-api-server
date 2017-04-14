@@ -34,8 +34,14 @@ class CsvResponder extends BaseResponder implements Responder
 	 */
 	public function setData($data): Responder
 	{
+		// Use the data wrapper if it exists
+		$data = isset($data['data']) ? $data['data'] : $data;
+
+		// If this is not a collection of items (numerically indexed array), coerce it to a collection of one
+		$data = isset($data[0]) ? $data : [$data];
+
 		// Guess columns based on array keys
-		$columns = array_keys($data[0]);
+		$columns  = array_keys($data[0]);
 		$filename = Carbon::now()->toDateTimeString() . '_export.csv';
 
 		$this->response->setContent($this->exportCSV($data, $columns));

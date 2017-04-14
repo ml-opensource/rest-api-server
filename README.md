@@ -5,7 +5,7 @@ A framework for rapid REST API development.
 
 ### Installation
 1. Require the repository in your `composer.json`
-1. Add the `ApiServerServiceProvider` to your application and publish its config.
+1. Add the `ApiServerServiceProvider` to your application and publish its config `artisan vendor:publish --provider="Fuzz\ApiServer\Providers\ApiServerServiceProvider"`.
 1. Extend the packaged route provider for your app:
 
 ```

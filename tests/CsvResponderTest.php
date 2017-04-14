@@ -24,7 +24,7 @@ class CsvResponderTest extends TestCase
 		$this->assertSame('Fighters', $responder->getResponse()->headers->get('X-Foo'));
 	}
 
-	public function testItCanSetData()
+	public function testItCanSetDataWithoutDataWrapper()
 	{
 		$responder = new CsvResponder;
 		$responder->setData([
@@ -32,6 +32,44 @@ class CsvResponderTest extends TestCase
 				'foo' => 'bar',
 				'baz' => 'bat',
 			]
+		]);
+
+		$this->assertSame("foo,baz\n\"bar\",\"bat\"", $responder->getResponse()->getContent());
+		$this->assertSame('text/csv', $responder->getResponse()->headers->get('Content-Type'));
+		$this->assertTrue(is_string($responder->getResponse()->headers->get('Content-Disposition')));
+	}
+
+	public function testItCanSetDataWithDataWrapperIfSingle()
+	{
+		$responder = new CsvResponder;
+		$responder->setData([
+			'data' => [
+				'foo' => 'bar',
+				'baz' => 'bat',
+			],
+			'pagination' => [
+				'foo' => 'bar',
+			],
+		]);
+
+		$this->assertSame("foo,baz\n\"bar\",\"bat\"", $responder->getResponse()->getContent());
+		$this->assertSame('text/csv', $responder->getResponse()->headers->get('Content-Type'));
+		$this->assertTrue(is_string($responder->getResponse()->headers->get('Content-Disposition')));
+	}
+
+	public function testItCanSetDataWithDataWrapperIfCollection()
+	{
+		$responder = new CsvResponder;
+		$responder->setData([
+			'data' => [
+				[
+					'foo' => 'bar',
+					'baz' => 'bat',
+				],
+			],
+			'pagination' => [
+				'foo' => 'bar',
+			],
 		]);
 
 		$this->assertSame("foo,baz\n\"bar\",\"bat\"", $responder->getResponse()->getContent());
