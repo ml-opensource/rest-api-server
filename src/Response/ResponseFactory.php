@@ -2,6 +2,7 @@
 
 namespace Fuzz\ApiServer\Response;
 
+use Fuzz\HttpException\BadRequestHttpException;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -59,7 +60,7 @@ class ResponseFactory
 	public function getResponderForFormat(string $format): Responder
 	{
 		if (! isset($this->responders[$format])) {
-			throw new \InvalidArgumentException("$format is not a valid response type.");
+			throw new BadRequestHttpException("$format is not a valid response type.");
 		}
 
 		return new $this->responders[$format];
@@ -94,7 +95,7 @@ class ResponseFactory
 	public function setResponseFormat(string $format): ResponseFactory
 	{
 		if (! isset($this->responders[$format])) {
-			throw new \InvalidArgumentException("$format is not a valid response type.");
+			throw new BadRequestHttpException("$format is not a valid response type.");
 		}
 
 		$this->responder = $this->getResponderForFormat($format);

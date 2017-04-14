@@ -5,6 +5,7 @@ namespace Fuzz\ApiServer\Tests;
 use Fuzz\ApiServer\Response\CsvResponder;
 use Fuzz\ApiServer\Response\JsonResponder;
 use Fuzz\ApiServer\Response\ResponseFactory;
+use Fuzz\HttpException\BadRequestHttpException;
 use InvalidArgumentException;
 use LogicException;
 
@@ -49,7 +50,7 @@ class ResponseFactoryTest extends TestCase
 			'json' => JsonResponder::class,
 		]);
 
-		$this->expectException(InvalidArgumentException::class);
+		$this->expectException(BadRequestHttpException::class);
 		$this->expectExceptionMessage('csv is not a valid response type.');
 		$factory->getResponderForFormat('csv');
 	}
@@ -60,7 +61,7 @@ class ResponseFactoryTest extends TestCase
 			'json' => JsonResponder::class,
 		]);
 
-		$this->expectException(InvalidArgumentException::class);
+		$this->expectException(BadRequestHttpException::class);
 		$this->expectExceptionMessage('csv is not a valid response type.');
 		$factory->setResponseFormat('csv');
 	}
