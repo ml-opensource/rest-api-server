@@ -9,7 +9,7 @@
 		}
 	],
 	"require": {
-		"php": ">=5.5.0",
+		"php": ">=7.0",
 		"fuzz/laravel-data": "1.0.*",
 		"fuzz/laravel-oauth": "dev-feature_support_laravel_53",
 		"fuzz/magic-box": "dev-feature_support_laravel_53",

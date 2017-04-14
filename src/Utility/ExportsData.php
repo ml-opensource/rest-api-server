@@ -2,7 +2,7 @@
 
 namespace Fuzz\ApiServer\Utility;
 
-trait ExportsData
+trait ExportsCSV
 {
 	/**
 	 * Map export content types to supported formats
@@ -22,7 +22,7 @@ trait ExportsData
 	 * @param null|string $filename
 	 * @return mixed
 	 */
-	public function export($format, array $data, array $column_mappings, $filename = null)
+	public function exportCSV($format, array $data, array $column_mappings, $filename = null)
 	{
 		$method = camel_case('build_' . $format);
 		$output = $this->$method($data, $column_mappings);
@@ -42,9 +42,9 @@ trait ExportsData
 	 * @param array $column_mappings
 	 * @return string
 	 */
-	protected function buildCsv(array $data, array $column_mappings)
+	protected function buildCSV(array $data, array $column_mappings)
 	{
-		$output = $this->buildCsvHeaders($column_mappings);
+		$output = $this->buildCSVHeaders($column_mappings);
 		foreach ($data as $row) {
 			$row_data = [];
 
@@ -78,7 +78,7 @@ trait ExportsData
 	 * @param array $column_mappings
 	 * @return string
 	 */
-	protected function buildCsvHeaders($column_mappings)
+	protected function buildCSVHeaders($column_mappings)
 	{
 		return implode(',', $column_mappings) . PHP_EOL;
 	}
