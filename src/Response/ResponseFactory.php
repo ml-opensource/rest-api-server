@@ -18,7 +18,7 @@ class ResponseFactory
 	 *
 	 * @var array
 	 */
-	private $responders;
+	private $responders = [];
 
 	/**
 	 * @var \Fuzz\ApiServer\Response\Responder
@@ -36,6 +36,55 @@ class ResponseFactory
 	}
 
 	/**
+	 * Get the currentlly set responder
+	 *
+	 * @return \Fuzz\ApiServer\Response\Responder
+	 */
+	public function getResponder(): Responder
+	{
+		if (is_null($this->responder)) {
+			throw new \LogicException('No responder has been set.');
+		}
+
+		return $this->responder;
+	}
+
+	/**
+	 * Get the currentlly set responder
+	 *
+	 * @param string $format
+	 *
+	 * @return \Fuzz\ApiServer\Response\Responder
+	 */
+	public function getResponderForFormat(string $format): Responder
+	{
+		if (! isset($this->responders[$format])) {
+			throw new \InvalidArgumentException("$format is not a valid response type.");
+		}
+
+		return new $this->responders[$format];
+	}
+
+	/**
+	 * Set a responder for a given format
+	 *
+	 * @param string $format
+	 * @param string $responder_class
+	 *
+	 * @return \Fuzz\ApiServer\Response\ResponseFactory
+	 */
+	public function setResponderForFormat(string $format, string $responder_class): ResponseFactory
+	{
+		if (! class_implements($responder_class, Responder::class)) {
+			throw new \InvalidArgumentException("$responder_class is not valid responder.");
+		}
+
+		$this->responders[$format] = $responder_class;
+
+		return $this;
+	}
+
+	/**
 	 * Set a response format
 	 *
 	 * @param string $format
@@ -48,7 +97,7 @@ class ResponseFactory
 			throw new \InvalidArgumentException("$format is not a valid response type.");
 		}
 
-		$this->responder = new $this->responders[$format];
+		$this->responder = $this->getResponderForFormat($format);
 
 		return $this;
 	}
