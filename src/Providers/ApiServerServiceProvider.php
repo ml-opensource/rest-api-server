@@ -16,8 +16,6 @@ class ApiServerServiceProvider extends ServiceProvider
 	*/
 	public function boot(DispatcherContract $events)
 	{
-		parent::boot($events);
-
 		$config_file = realpath(__DIR__ . '/../config/api.php');
 		$this->publishes(
 			[
