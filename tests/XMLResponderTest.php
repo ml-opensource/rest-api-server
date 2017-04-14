@@ -31,7 +31,7 @@ class XMLResponderTest extends TestCase
 			'foo' => 'bar'
 		]);
 
-		$this->assertSame("<?xml version=\"1.0\"?>\n<root><bar>foo</bar></root>", $responder->getResponse()->getContent());
+		$this->assertSame("<?xml version=\"1.0\"?>\n<root><foo>bar</foo></root>", $responder->getResponse()->getContent());
 		$this->assertSame('application/xml', $responder->getResponse()->headers->get('Content-Type'));
 	}
 }

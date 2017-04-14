@@ -33,7 +33,7 @@ class XMLResponder extends BaseResponder implements Responder
 	public function setData($data): Responder
 	{
 		$xml = new SimpleXMLElement('<root/>');
-		array_walk_recursive($data, [$xml, 'addChild']);
+		$this->toXML($xml, $data);
 
 		$response_data = $xml->asXML();
 
@@ -47,5 +47,23 @@ class XMLResponder extends BaseResponder implements Responder
 		]);
 
 		return $this;
+	}
+
+	/**
+	 * Parse a PHP array to XML
+	 *
+	 * @param \SimpleXMLElement $xml
+	 * @param array             $data
+	 */
+	private function toXML(SimpleXMLElement $xml, array $data)
+	{
+		foreach ($data as $key => $value) {
+			if (is_array($value)) {
+				$new_object = $xml->addChild($key);
+				$this->toXML($new_object, $value);
+			} else {
+				$xml->addChild($key, $value);
+			}
+		}
 	}
 }
