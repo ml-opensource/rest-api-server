@@ -10,7 +10,7 @@
 	],
 	"require": {
 		"php": ">=7.0",
-		"fuzz/laravel-data": "1.0.*",
+		"fuzz/laravel-data": "dev-replace_serializations as 1.0",
 		"fuzz/laravel-oauth": "dev-feature_support_laravel_53",
 		"fuzz/magic-box": "dev-feature_support_laravel_53",
 		"fuzz/http-exception": "1.0.*",
@@ -18,9 +18,14 @@
 		"league/csv": "^7.2@dev",
 		"lucadegasperi/oauth2-server-laravel": "5.2.*"
 	},
+	"require-dev": {
+		"mockery/mockery": "0.9.*",
+		"phpunit/phpunit": "~5.6"
+	},
 	"autoload": {
 		"psr-4": {
-			"Fuzz\\ApiServer\\": "src/"
+			"Fuzz\\ApiServer\\": "src/",
+			"Fuzz\\ApiServer\\Tests\\": "tests/"
 		}
 	}
 }
