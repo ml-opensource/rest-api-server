@@ -2,6 +2,8 @@
 
 namespace Fuzz\ApiServer\Providers;
 
+use Fuzz\ApiServer\Response\CsvResponder;
+use Fuzz\ApiServer\Response\JsonResponder;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Fuzz\ApiServer\Response\ResponseFactory;
 use Illuminate\Support\ServiceProvider;
@@ -32,7 +34,10 @@ class ApiServerServiceProvider extends ServiceProvider
 	public function register()
 	{
 		$this->app->singleton(ResponseFactory::class, function ($app) {
-			return new ResponseFactory(config('api.responders'));
+			return new ResponseFactory(config('api.responders', [
+				'json' => JsonResponder::class,
+				'csv'  => CsvResponder::class,
+			]));
 		});
 	}
 }
