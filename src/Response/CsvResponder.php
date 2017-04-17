@@ -4,7 +4,6 @@ namespace Fuzz\ApiServer\Response;
 
 use Carbon\Carbon;
 use Fuzz\ApiServer\Utility\ExportsCSV;
-use Illuminate\Http\Response;
 
 class CsvResponder extends BaseResponder implements Responder
 {
@@ -16,14 +15,6 @@ class CsvResponder extends BaseResponder implements Responder
 	 * @const string
 	 */
 	const CONTENT_TYPE = 'text/csv';
-
-	/**
-	 * JsonResponder constructor.
-	 */
-	public function __construct()
-	{
-		$this->response = new Response;
-	}
 
 	/**
 	 * Set data for the response

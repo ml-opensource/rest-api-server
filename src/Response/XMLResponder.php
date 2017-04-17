@@ -2,7 +2,6 @@
 
 namespace Fuzz\ApiServer\Response;
 
-use Illuminate\Http\Response;
 use InvalidArgumentException;
 use SimpleXMLElement;
 
@@ -14,14 +13,6 @@ class XMLResponder extends BaseResponder implements Responder
 	 * @const string
 	 */
 	const CONTENT_TYPE = 'application/xml';
-
-	/**
-	 * JsonResponder constructor.
-	 */
-	public function __construct()
-	{
-		$this->response = new Response;
-	}
 
 	/**
 	 * Set data for the response
