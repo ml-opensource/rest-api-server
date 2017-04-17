@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3465ad86a9c812a3b62c45e03cd3a54a",
+    "content-hash": "d9c55d9ebf55ae05027ec65c7b14a028",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -994,6 +994,74 @@
             "time": "2017-03-13T17:10:33+00:00"
         },
         {
+            "name": "maatwebsite/excel",
+            "version": "2.1.17",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Maatwebsite/Laravel-Excel.git",
+                "reference": "14d5abf8e20563c80dd074fd7c8cf1c05bf51f1d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Maatwebsite/Laravel-Excel/zipball/14d5abf8e20563c80dd074fd7c8cf1c05bf51f1d",
+                "reference": "14d5abf8e20563c80dd074fd7c8cf1c05bf51f1d",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/cache": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*",
+                "illuminate/config": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*",
+                "illuminate/filesystem": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*",
+                "illuminate/support": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*",
+                "jeremeamia/superclosure": "^2.3",
+                "nesbot/carbon": "~1.0",
+                "php": ">=5.5",
+                "phpoffice/phpexcel": "1.8.*",
+                "tijsverkoyen/css-to-inline-styles": "~2.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "~0.9",
+                "orchestra/testbench": "3.1.*",
+                "phpseclib/phpseclib": "~1.0",
+                "phpunit/phpunit": "~4.0"
+            },
+            "suggest": {
+                "illuminate/http": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*",
+                "illuminate/queue": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*",
+                "illuminate/routing": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*",
+                "illuminate/view": "5.0.*|5.1.*|5.2.*|5.3.*|5.4.*"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/Maatwebsite/Excel"
+                ],
+                "psr-0": {
+                    "Maatwebsite\\Excel\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Maatwebsite.nl",
+                    "email": "patrick@maatwebsite.nl"
+                }
+            ],
+            "description": "An eloquent way of importing and exporting Excel and CSV in Laravel 4 with the power of PHPExcel",
+            "keywords": [
+                "PHPExcel",
+                "batch",
+                "csv",
+                "excel",
+                "export",
+                "import",
+                "laravel"
+            ],
+            "time": "2017-04-04T18:28:12+00:00"
+        },
+        {
             "name": "monolog/monolog",
             "version": "1.22.1",
             "source": {
@@ -1266,6 +1334,63 @@
                 "random"
             ],
             "time": "2017-03-13T16:27:32+00:00"
+        },
+        {
+            "name": "phpoffice/phpexcel",
+            "version": "1.8.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PHPOffice/PHPExcel.git",
+                "reference": "372c7cbb695a6f6f1e62649381aeaa37e7e70b32"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PHPOffice/PHPExcel/zipball/372c7cbb695a6f6f1e62649381aeaa37e7e70b32",
+                "reference": "372c7cbb695a6f6f1e62649381aeaa37e7e70b32",
+                "shasum": ""
+            },
+            "require": {
+                "ext-xml": "*",
+                "ext-xmlwriter": "*",
+                "php": ">=5.2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PHPExcel": "Classes/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Maarten Balliauw",
+                    "homepage": "http://blog.maartenballiauw.be"
+                },
+                {
+                    "name": "Mark Baker"
+                },
+                {
+                    "name": "Franck Lefevre",
+                    "homepage": "http://blog.rootslabs.net"
+                },
+                {
+                    "name": "Erik Tilt"
+                }
+            ],
+            "description": "PHPExcel - OpenXML - Read, Create and Write Spreadsheet documents in PHP - Spreadsheet engine",
+            "homepage": "http://phpexcel.codeplex.com",
+            "keywords": [
+                "OpenXML",
+                "excel",
+                "php",
+                "spreadsheet",
+                "xls",
+                "xlsx"
+            ],
+            "time": "2015-05-01T07:00:55+00:00"
         },
         {
             "name": "psr/log",
@@ -1583,6 +1708,59 @@
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
             "time": "2017-01-08T20:43:43+00:00"
+        },
+        {
+            "name": "symfony/css-selector",
+            "version": "v3.1.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/css-selector.git",
+                "reference": "722a87478a72d95dc2a3bcf41dc9c2d13fd4cb2d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/css-selector/zipball/722a87478a72d95dc2a3bcf41dc9c2d13fd4cb2d",
+                "reference": "722a87478a72d95dc2a3bcf41dc9c2d13fd4cb2d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\CssSelector\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jean-François Simon",
+                    "email": "jeanfrancois.simon@sensiolabs.com"
+                },
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony CssSelector Component",
+            "homepage": "https://symfony.com",
+            "time": "2017-01-02T20:31:54+00:00"
         },
         {
             "name": "symfony/debug",
@@ -2370,6 +2548,53 @@
             "time": "2017-01-24T13:02:38+00:00"
         },
         {
+            "name": "tijsverkoyen/css-to-inline-styles",
+            "version": "2.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tijsverkoyen/CssToInlineStyles.git",
+                "reference": "ab03919dfd85a74ae0372f8baf9f3c7d5c03b04b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tijsverkoyen/CssToInlineStyles/zipball/ab03919dfd85a74ae0372f8baf9f3c7d5c03b04b",
+                "reference": "ab03919dfd85a74ae0372f8baf9f3c7d5c03b04b",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.5 || ^7",
+                "symfony/css-selector": "^2.7|~3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.8|5.1.*"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "TijsVerkoyen\\CssToInlineStyles\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Tijs Verkoyen",
+                    "email": "css_to_inline_styles@verkoyen.eu",
+                    "role": "Developer"
+                }
+            ],
+            "description": "CssToInlineStyles is a class that enables you to convert HTML-pages/files into HTML-pages/files with inline styles. This is very useful when you're sending emails.",
+            "homepage": "https://github.com/tijsverkoyen/CssToInlineStyles",
+            "time": "2016-09-20T12:50:39+00:00"
+        },
+        {
             "name": "vlucas/phpdotenv",
             "version": "v2.4.0",
             "source": {
@@ -2474,6 +2699,54 @@
                 "instantiate"
             ],
             "time": "2015-06-14T21:17:01+00:00"
+        },
+        {
+            "name": "fzaninotto/faker",
+            "version": "v1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fzaninotto/Faker.git",
+                "reference": "44f9a286a04b80c76a4e5fb7aad8bb539b920123"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/44f9a286a04b80c76a4e5fb7aad8bb539b920123",
+                "reference": "44f9a286a04b80c76a4e5fb7aad8bb539b920123",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3.3|^7.0"
+            },
+            "require-dev": {
+                "ext-intl": "*",
+                "phpunit/phpunit": "~4.0",
+                "squizlabs/php_codesniffer": "~1.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": []
+            },
+            "autoload": {
+                "psr-4": {
+                    "Faker\\": "src/Faker/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "François Zaninotto"
+                }
+            ],
+            "description": "Faker is a PHP library that generates fake data for you.",
+            "keywords": [
+                "data",
+                "faker",
+                "fixtures"
+            ],
+            "time": "2016-04-29T12:21:54+00:00"
         },
         {
             "name": "hamcrest/hamcrest-php",
@@ -2626,6 +2899,123 @@
                 "object graph"
             ],
             "time": "2017-04-12T18:52:22+00:00"
+        },
+        {
+            "name": "orchestra/database",
+            "version": "v3.3.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/orchestral/database.git",
+                "reference": "f6b84efe22415e77af5b98701bd9d27b6ad10aec"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/orchestral/database/zipball/f6b84efe22415e77af5b98701bd9d27b6ad10aec",
+                "reference": "f6b84efe22415e77af5b98701bd9d27b6ad10aec",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "~5.3.0",
+                "illuminate/database": "~5.3.0",
+                "php": ">=5.6.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Orchestra\\Database\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mior Muhammad Zaki",
+                    "email": "crynobone@gmail.com",
+                    "homepage": "https://github.com/crynobone"
+                },
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylorotwell@gmail.com",
+                    "homepage": "https://github.com/taylorotwell"
+                }
+            ],
+            "description": "Database Component for Orchestra Platform",
+            "keywords": [
+                "database",
+                "orchestra-platform",
+                "orchestral"
+            ],
+            "time": "2017-02-08T02:33:45+00:00"
+        },
+        {
+            "name": "orchestra/testbench",
+            "version": "v3.3.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/orchestral/testbench.git",
+                "reference": "260ff3584b401200bb85b3976bb1dc138d362d05"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/orchestral/testbench/zipball/260ff3584b401200bb85b3976bb1dc138d362d05",
+                "reference": "260ff3584b401200bb85b3976bb1dc138d362d05",
+                "shasum": ""
+            },
+            "require": {
+                "fzaninotto/faker": "~1.4",
+                "laravel/framework": "~5.3.29",
+                "orchestra/database": "~3.3.6",
+                "php": ">=5.6.0",
+                "symfony/css-selector": "3.1.*",
+                "symfony/dom-crawler": "3.1.*"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "phpunit/phpunit": "~4.8 || ~5.0"
+            },
+            "suggest": {
+                "phpunit/phpunit": "Allow to use PHPUnit for testing your Laravel Application/Package (~4.0|~5.0)."
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Orchestra\\Testbench\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mior Muhammad Zaki",
+                    "email": "crynobone@gmail.com",
+                    "homepage": "https://github.com/crynobone"
+                }
+            ],
+            "description": "Laravel Testing Helper for Packages Development",
+            "homepage": "http://orchestraplatform.com/docs/latest/components/testbench/",
+            "keywords": [
+                "BDD",
+                "TDD",
+                "laravel",
+                "orchestra-platform",
+                "orchestral",
+                "testing"
+            ],
+            "time": "2017-03-10T06:55:12+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -3738,6 +4128,62 @@
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
             "time": "2016-10-03T07:35:21+00:00"
+        },
+        {
+            "name": "symfony/dom-crawler",
+            "version": "v3.1.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/dom-crawler.git",
+                "reference": "7eede2a901a19928494194f7d1815a77b9a473a0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/7eede2a901a19928494194f7d1815a77b9a473a0",
+                "reference": "7eede2a901a19928494194f7d1815a77b9a473a0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9",
+                "symfony/polyfill-mbstring": "~1.0"
+            },
+            "require-dev": {
+                "symfony/css-selector": "~2.8|~3.0"
+            },
+            "suggest": {
+                "symfony/css-selector": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\DomCrawler\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony DomCrawler Component",
+            "homepage": "https://symfony.com",
+            "time": "2017-01-21T17:13:55+00:00"
         },
         {
             "name": "symfony/yaml",

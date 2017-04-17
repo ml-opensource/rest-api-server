@@ -16,11 +16,13 @@
 		"fuzz/http-exception": "1.0.*",
 		"laravel/framework": "5.3.*",
 		"league/csv": "^7.2@dev",
-		"lucadegasperi/oauth2-server-laravel": "5.2.*"
+		"lucadegasperi/oauth2-server-laravel": "5.2.*",
+		"maatwebsite/excel": "^2.1"
 	},
 	"require-dev": {
 		"mockery/mockery": "0.9.*",
-		"phpunit/phpunit": "~5.6"
+		"phpunit/phpunit": "~5.6",
+		"orchestra/testbench": "3.3.*"
 	},
 	"autoload": {
 		"psr-4": {
