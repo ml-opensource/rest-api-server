@@ -5,6 +5,7 @@ A framework for rapid REST API development.
 
 ### Installation
 1. Require the repository in your `composer.json`
+1. Add the `ApiServerServiceProvider` to your application and publish its config `artisan vendor:publish --provider="Fuzz\ApiServer\Providers\ApiServerServiceProvider"`.
 1. Extend the packaged route provider for your app:
 
 ```
@@ -182,24 +183,4 @@ Handles nested JSON and form properties just fine:
 
 ### CORS Middleware
 Configuring the CORS middleware is as simple as adding `Fuzz\ApiServer\Routing\CorsMiddleware` to the `$middleware` array in `app/Http/Kernel.php`.
-
-## Serializing Data
-`fuzz/api-server` wraps [league/fractal](http://fractal.thephpleague.com/) to serialize data output. `Fuzz\ApiServer\Routing\ResourceController` uses the `Fuzz\ApiServer\Utility\SerializesData` trait so any ResourceController extending it will do so as well. You can use serialization in any controller by including the trait and using it's methods.
-
-1. `Fuzz\ApiServer\Utility\SerializesData` exposes `serialize` for single items and `serializeCollection` for collections. They will both accept an `Illuminate\Pagination\AbstractPaginator` or a simple array for data, a transformer as a string or `\Closure`, and a format (defaults to json).
-1. Controllers extending `Fuzz\ApiServer\Routing\ResourceController` can use `Fuzz\ApiServer\Routing\ResourceController@modelTransformer` to resolve a model class' transformer. A transformer is defined in a public model property `model_transformer` and can be of any type accepted by `serialize` and `serializeCollection`
-
-`fuzz/api-server` provides some basic transformers out of the box:
-
-```
-use Fuzz\Data\Serialization\FuzzModelTransformer; // array -> json
-use Fuzz\Data\Serialization\FuzzExportableModelTransformer; // array -> csv
-```
-
-And some serializers:
-
-```
-use Fuzz\Data\Serialization\FuzzDataArraySerializer; // to array (and eventually to json)
-use Fuzz\Data\Serialization\FuzzCsvDataArraySerializer; // to csv
-```
 

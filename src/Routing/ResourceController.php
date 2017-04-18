@@ -2,18 +2,18 @@
 
 namespace Fuzz\ApiServer\Routing;
 
+use Fuzz\Data\Traits\Transformations;
+use Fuzz\Data\Transformations\Serialization\DefaultArrayTransformer;
 use Illuminate\Http\Request;
 use Fuzz\MagicBox\Contracts\Repository;
 use Fuzz\Auth\Policies\ChecksGatePolicies;
 use Fuzz\MagicBox\Utility\ChecksRelations;
-use Fuzz\ApiServer\Utility\SerializesData;
 use Fuzz\MagicBox\Contracts\MagicBoxResource;
-use Fuzz\Data\Serialization\FuzzModelTransformer;
-use Fuzz\Data\Serialization\FuzzArrayTransformer;
 use Fuzz\Auth\Policies\RepositoryModelPolicyInterface;
 use LucaDegasperi\OAuth2Server\Exceptions\NoActiveAccessTokenException;
 use Fuzz\HttpException\BadRequestHttpException;
 use Fuzz\HttpException\AccessDeniedHttpException;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class ResourceController
@@ -22,14 +22,7 @@ use Fuzz\HttpException\AccessDeniedHttpException;
  */
 class ResourceController extends Controller
 {
-	use SerializesData, ChecksGatePolicies, ChecksRelations;
-
-	/**
-	 * Default response format
-	 *
-	 * @var string
-	 */
-	const DEFAULT_FORMAT = 'json';
+	use Transformations, ChecksGatePolicies, ChecksRelations;
 
 	/**
 	 * Require a model policy to be present.
@@ -55,24 +48,21 @@ class ResourceController extends Controller
 	 *
 	 * @param \Fuzz\MagicBox\Contracts\Repository $repository
 	 * @param \Illuminate\Http\Request            $request
-	 * @return \Illuminate\Http\JsonResponse
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function index(Repository $repository, Request $request)
+	public function index(Repository $repository, Request $request): Response
 	{
 		$this->checkAndApplyPolicy(__FUNCTION__, $repository);
 
-		$model_class = $repository->getModelClass();
-
-		// @todo needs to be better
 		if ($request->get('paginate', 'true') === 'false' && $this->policy()->unpaginatedIndex($repository)) {
 			$paginator = $repository->all();
 		} else {
 			$paginator = $repository->paginate($this->getPerPage());
 		}
 
-		$serialized = $this->serializeCollection($paginator, $this->modelTransformer($model_class), $request->get('format', self::DEFAULT_FORMAT));
+		$transformed = $this->transformEntity($paginator);
 
-		return $this->succeed($serialized);
+		return $this->succeed($transformed);
 	}
 
 	/**
@@ -80,10 +70,10 @@ class ResourceController extends Controller
 	 *
 	 * @param \Fuzz\MagicBox\Contracts\Repository $repository
 	 * @param \Illuminate\Http\Request            $request
-	 * @return \Illuminate\Http\JsonResponse
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
 	 */
-	public function store(Repository $repository, Request $request)
+	public function store(Repository $repository, Request $request): Response
 	{
 		if ($request->get('id')) {
 			throw new BadRequestHttpException('You cannot create a resource with an id.', ['id' => [sprintf('You cannot create a resource with an id.')]]);
@@ -93,9 +83,9 @@ class ResourceController extends Controller
 
 		$created = $repository->create();
 
-		$serialized = $this->serialize($created, $this->modelTransformer($repository->getModelClass()), $request->get('format', self::DEFAULT_FORMAT));
+		$transformed = $this->transformEntity($created);
 
-		return $this->created($serialized);
+		return $this->created($transformed);
 	}
 
 	/**
@@ -103,17 +93,17 @@ class ResourceController extends Controller
 	 *
 	 * @param \Fuzz\MagicBox\Contracts\Repository $repository
 	 * @param \Illuminate\Http\Request            $request
-	 * @return \Illuminate\Http\JsonResponse
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function show(Repository $repository, Request $request)
+	public function show(Repository $repository, Request $request): Response
 	{
 		$this->checkAndApplyPolicy(__FUNCTION__, $repository);
 
 		$resource = $repository->read();
 
-		$serialized = $this->serialize($resource, $this->modelTransformer($repository->getModelClass()), $request->get('format', self::DEFAULT_FORMAT));
+		$transformed = $this->transformEntity($resource);
 
-		return $this->succeed($serialized);
+		return $this->succeed($transformed);
 	}
 
 	/**
@@ -121,17 +111,17 @@ class ResourceController extends Controller
 	 *
 	 * @param \Fuzz\MagicBox\Contracts\Repository $repository
 	 * @param \Illuminate\Http\Request            $request
-	 * @return \Illuminate\Http\JsonResponse
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function update(Repository $repository, Request $request)
+	public function update(Repository $repository, Request $request): Response
 	{
 		$this->checkAndApplyPolicy(__FUNCTION__, $repository);
 
 		$resource = $repository->save();
 
-		$serialized = $this->serialize($resource, $this->modelTransformer($repository->getModelClass()), $request->get('format', self::DEFAULT_FORMAT));
+		$transformed = $this->transformEntity($resource);
 
-		return $this->succeed($serialized);
+		return $this->succeed($transformed);
 	}
 
 	/**
@@ -139,15 +129,18 @@ class ResourceController extends Controller
 	 *
 	 * @param \Fuzz\MagicBox\Contracts\Repository $repository
 	 * @param \Illuminate\Http\Request            $request
-	 * @return \Illuminate\Http\JsonResponse
+	 * @param int                                 $id
+	 *
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function destroy(Repository $repository, Request $request)
+	public function destroy(Repository $repository, Request $request, int $id): Response
 	{
 		$this->checkAndApplyPolicy(__FUNCTION__, $repository);
 
-		$serialized = $this->serialize(['status' => $repository->delete()], FuzzArrayTransformer::class, $request->get('format', self::DEFAULT_FORMAT));
+		$this->transformer = DefaultArrayTransformer::class;
+		$transformed = $this->transformEntity(['status' => $repository->delete($id)]);
 
-		return $this->succeed($serialized);
+		return $this->succeed($transformed);
 	}
 
 	/**
@@ -162,11 +155,11 @@ class ResourceController extends Controller
 		$this->requirePolicy($repository);
 
 		try {
-			if (! $this->policy()->{$action}($repository)) { // @todo fix
-				throw new AccessDeniedHttpException('Access denied.');
+			if (! $this->policy()->{$action}($repository)) {
+				throw new AccessDeniedHttpException;
 			}
 		} catch (NoActiveAccessTokenException $exception) {
-			throw new AccessDeniedHttpException('Access denied.');
+			throw new AccessDeniedHttpException;
 		}
 
 		$model_class = $repository->getModelClass();
@@ -272,18 +265,5 @@ class ResourceController extends Controller
 		}
 
 		$this->validateCascadingRelations($related, $input, $repository);
-	}
-
-	/**
-	 * Find the model transformer to use for serialization
-	 *
-	 * @param string $model_class
-	 * @return mixed
-	 */
-	public function modelTransformer($model_class)
-	{
-		$instance = new $model_class;
-
-		return isset($instance->model_transformer) ? $instance->model_transformer : FuzzModelTransformer::class;
 	}
 }
