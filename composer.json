@@ -11,7 +11,7 @@
 	"require": {
 		"php": ">=7.0",
 		"laravel/framework": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.*",
-		"fuzz/laravel-data": "dev-replace_serializations as 1.0",
+		"fuzz/laravel-data": "1.1.x-dev as 1.1",
 		"fuzz/laravel-oauth": "dev-feature_support_laravel_53",
 		"fuzz/magic-box": "dev-feature_support_laravel_53",
 		"fuzz/http-exception": "1.0.*",
