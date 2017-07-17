@@ -34,7 +34,6 @@ class HandlerTest extends AppTestCase
 		$this->assertArrayNotHasKey('debug', $responseData);
 	}
 
-
 	public function testCanGetResponseDataFromExceptionWithDebugExtras()
 	{
 		$this->app['config']->set('app.debug', true);

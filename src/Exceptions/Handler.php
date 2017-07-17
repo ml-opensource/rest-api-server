@@ -5,6 +5,7 @@ namespace Fuzz\ApiServer\Exceptions;
 
 use Exception;
 use Fuzz\HttpException\HttpException;
+use Fuzz\HttpException\NotFoundHttpException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -13,21 +14,6 @@ use Illuminate\Http\JsonResponse;
 
 class Handler extends ExceptionHandler
 {
-	/**
-	 * A list of the exception types that should not be reported.
-	 *
-	 * @var array
-	 */
-	protected $dontReport = [
-		\Illuminate\Auth\AuthenticationException::class,
-		\Illuminate\Auth\Access\AuthorizationException::class,
-		\Symfony\Component\HttpKernel\Exception\HttpException::class,
-		\Illuminate\Database\Eloquent\ModelNotFoundException::class,
-		\Illuminate\Session\TokenMismatchException::class,
-		\Illuminate\Validation\ValidationException::class,
-		JsonValidationException::class,
-	];
-
 	/**
 	 * Render a JSON HTTP response based on the exception.
 	 *
@@ -128,9 +114,7 @@ class Handler extends ExceptionHandler
 	 */
 	protected function convertFromModelNotFound(ModelNotFoundException $err): HttpException
 	{
-		$statusCode       = 404;
 		$errorDescription = 'Unable to find ' . class_basename($err->getModel()) . '.';
-		$error            = 'not_found';
 		$errorData        = [
 			'model' => $err->getModel(),
 			'ids'   => $err->getIds(),
@@ -138,7 +122,7 @@ class Handler extends ExceptionHandler
 		$userTitle        = 'Not Found!';
 		$userMessage      = 'Sorry, seems we can\'t find what you\'re looking for';
 
-		return new HttpException($statusCode, $errorDescription, $error, $errorData, $userTitle, $userMessage, $err);
+		return new NotFoundHttpException($errorDescription, $errorData, $userTitle, $userMessage, $err);
 	}
 
 	/**
