@@ -5,16 +5,16 @@
 	"authors": [
 		{
 			"name": "Fuzz Productions",
-			"email": "fuzzweb@fuzzproductions.com"
+			"email": "opensource@fuzzproductions.com"
 		}
 	],
 	"require": {
 		"php": ">=7.0",
-		"fuzz/laravel-data": "dev-replace_serializations as 1.0",
-		"fuzz/laravel-oauth": "dev-feature_support_laravel_53",
-		"fuzz/magic-box": "dev-feature_support_laravel_53",
-		"fuzz/http-exception": "1.0.*",
-		"laravel/framework": "5.3.*",
+		"laravel/framework": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.*",
+		"fuzz/laravel-data": "1.1.x-dev as 1.1",
+		"fuzz/laravel-oauth": "1.1.x-dev as 1.1",
+		"fuzz/magic-box": "1.2.x-dev as 1.2",
+		"fuzz/http-exception": "1.1.x-dev as 1.1",
 		"league/csv": "^7.2@dev",
 		"lucadegasperi/oauth2-server-laravel": "5.2.*",
 		"maatwebsite/excel": "^2.1"
@@ -29,5 +29,16 @@
 			"Fuzz\\ApiServer\\": "src/",
 			"Fuzz\\ApiServer\\Tests\\": "tests/"
 		}
+	},
+	"scripts": {
+		"test": [
+			"vendor/bin/phpunit"
+		],
+		"test-coverage": [
+			"vendor/bin/phpunit --coverage-html tests/coverage"
+		],
+		"open-coverage": [
+			"open -a \"Google Chrome\" tests/coverage/index.html"
+		]
 	}
 }
