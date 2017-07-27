@@ -1,0 +1,145 @@
+<?php
+
+namespace DummyNamespace;
+
+use Tests\ApiTestCase as TestCase;
+use DummyFullModelClass;
+
+class DummyClass extends TestCase
+{
+	/**
+	 * @test
+	 *
+	 * Given
+	 *      I have the required permissions.
+	 *      And I want to retrieve a list of resources.
+	 * When
+	 *      I make a GET request.
+	 * Then
+	 *      I should get the response: OK 200
+	 *      And get a list of resources.
+	 */
+	public function testCanGetResources()
+	{
+		$url = "{$this->apiVersion}/DummyUrlPath";
+		$headers = [];
+		$keys = [];
+
+		$res = $this->get($url, $headers);
+
+		$res->assertStatus(200);
+		$res->assertJsonStructure([
+			'data' => ['*' => $keys]
+		]);
+	}
+
+	/**
+	 * @test
+	 *
+	 * Given
+	 *      I have the required permissions.
+	 *      And I want to retrieve a single resource.
+	 * When
+	 *      I make a GET request.
+	 * Then
+	 *      I should get the response: OK 200
+	 *      And get the resource.
+	 */
+	public function testCanGetResource()
+	{
+		$id = 100;
+		factory(DummyModelClass::class)->create(['id' => $id]);
+		$url = "{$this->apiVersion}/DummyUrlPath/{$id}";
+		$headers = [];
+		$keys = [];
+
+		$res = $this->get($url, $headers);
+
+		$res->assertStatus(200);
+		$res->assertJsonStructure([
+			'data' => $keys
+		]);
+	}
+
+	/**
+	 * @test
+	 *
+	 * Given
+	 *      I have the required permissions.
+	 *      And I want to create a resource.
+	 * When
+	 *      I make a POST request.
+	 * Then
+	 *      I should get the response: Created (201)
+	 *      And a new resource should be created.
+	 */
+	public function testCanPostResources()
+	{
+		$url  = "/{$this->apiVersion}/DummyUrlPath";
+		$headers = [];
+		$data = [];
+		$keys = [];
+
+		$res = $this->post($url, $data, $headers);
+
+		$res->assertStatus(201);
+		$res->assertJsonStructure([
+			'data' => $keys
+		]);
+	}
+
+	/**
+	 * @test
+	 *
+	 * Given
+	 *      I have the required permissions.
+	 *      And want to edit a resource
+	 * When
+	 *      I make a PUT request.
+	 * Then
+	 *      I should get the response: OK (200)
+	 *      And the resource should be edited.
+	 */
+	public function testCanPutResource()
+	{
+		$id = 100;
+		factory(DummyModelClass::class)->create(['id' => $id]);
+		$url = "{$this->apiVersion}/DummyUrlPath/{$id}";
+		$headers = [];
+		$data = [];
+		$keys = [];
+
+		$res = $this->put($url, $data, $headers);
+
+		$res->assertStatus(200);
+		$res->assertJsonStructure([
+			'data' => $keys
+		]);
+	}
+
+	/**
+	 * @test
+	 *
+	 * Given
+	 *      I have the required permissions.
+	 *      And want to delete a resource.
+	 * When
+	 *      I make a DELETE request.
+	 * Then
+	 *      I should get the response: OK (200)
+	 *      And the resource should be deleted.
+	 */
+	public function testCanDeleteResource()
+	{
+		$id = 100;
+		factory(DummyModelClass::class)->create(['id' => $id]);
+		$this->assertNotNull(DummyModelClass::find($id));
+		$url = "{$this->apiVersion}/DummyUrlPath/{$id}";
+		$headers = [];
+
+		$res = $this->delete($url, [], $headers);
+
+		$res->assertStatus(200);
+		$this->assertNull(DummyModelClass::find($id));
+	}
+}

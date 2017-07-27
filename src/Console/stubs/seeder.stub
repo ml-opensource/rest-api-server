@@ -1,0 +1,34 @@
+<?php
+
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use DummyFullModelClass;
+
+class DummyClass extends Seeder
+{
+	protected $table = DummyModelClass::TABLE;
+
+	/**
+	 * Run the database seeds.
+	 *
+	 * @return void
+	 */
+	public function run()
+	{
+		$collection = [];
+		$amount = 100;
+		$now = Carbon::now();
+		$faker = Faker\Factory::create();
+
+		for ($count = 0; $count < $amount; $count++) {
+			$collection[] = [
+				// Add more fields.
+				'created_at' => $now,
+				'updated_at' => $now,
+			];
+		}
+
+		DB::table($this->table)->insert($collection);
+	}
+}
