@@ -3,6 +3,7 @@
 namespace Fuzz\ApiServer\Providers;
 
 
+use Fuzz\ApiServer\Console\Commands\ModelRelationshipGen;
 use Fuzz\ApiServer\Console\GenControllerCommand;
 use Fuzz\ApiServer\Console\GenFactoryCommand;
 use Fuzz\ApiServer\Console\GenForCommand;
@@ -32,6 +33,7 @@ class GeneratorConsoleCmdServiceProvider extends ServiceProvider
 				GenSeederCommand::class,
 				GenTestCommand::class,
 				PrintTokenCommand::class,
+				ModelRelationshipGen::class,
 			]);
 		}
 	}
