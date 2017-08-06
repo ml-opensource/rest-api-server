@@ -3,6 +3,7 @@
 
 namespace Fuzz\ApiServer\Console\Commands\ModelGeneration;
 
+use Fuzz\ApiServer\Console\ModelGeneration\RelationStub;
 use Illuminate\Filesystem\Filesystem;
 
 

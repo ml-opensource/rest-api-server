@@ -3,8 +3,9 @@
 
 namespace Fuzz\ApiServer\Console\ModelGeneration;
 
+use Fuzz\ApiServer\Console\Commands\ModelGeneration\StubWriter;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Filesystem\Filesystem;
 
 
 /**
@@ -12,26 +13,55 @@ use Illuminate\Database\Eloquent\Relations\Relation;
  *
  * @package Fuzz\ApiServer\Console\ModelGeneration
  *
- * @author Kirill Fuchs <kfuchs@fuzzproductions.com>
+ * @author  Kirill Fuchs <kfuchs@fuzzproductions.com>
  */
 class ModelWriter
 {
+	/**
+	 * The list of models we want to write to.
+	 *
+	 * @var array
+	 */
 	protected $models;
+
+	/**
+	 * The relation tree holding all the info.
+	 *
+	 * @var RelationTree
+	 */
 	protected $tree;
+
+	/**
+	 * Laravel app for FileSystem access mostly.
+	 *
+	 * @var Application
+	 */
 	protected $app;
 
+	/**
+	 * ModelWriter constructor.
+	 *
+	 * @param Application  $app
+	 * @param RelationTree $tree
+	 * @param array|null   $models
+	 */
 	public function __construct(Application $app, RelationTree $tree, array $models = null)
 	{
-		$this->app = $app;
+		$this->app    = $app;
 		$this->models = $models;
-		$this->tree = $tree;
+		$this->tree   = $tree;
 	}
 
 
+	/**
+	 * Write to all the model files we passed in.
+	 *
+	 * Think of this as a `run` command.
+	 */
 	public function writeToFiles()
 	{
 		$modelNodes = $this->tree->only($this->models);
-		//dd($this->tree->only($this->models));
+
 		foreach ($modelNodes as $modelNode) {
 
 			$this->writeToFile($modelNode);
@@ -39,6 +69,13 @@ class ModelWriter
 		}
 	}
 
+	/**
+	 * Run through each relation for a model, and attempt to write them to the file.
+	 *
+	 * @param ModelNode $modelNode
+	 *
+	 * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+	 */
 	public function writeToFile(ModelNode $modelNode)
 	{
 		$path = $this->getPath($modelNode->getName());
@@ -50,25 +87,11 @@ class ModelWriter
 		}
 	}
 
-	//public function write(RelationDefinition $relation, $file)
-	//{
-	//
-	//	// Add in the use statement if it doesn't exist.
-	//	if (! strpos($file, $relation->getUseStatement())) {
-	//		$file = preg_replace('/(use .*;)/', '$1 ' . "\n{$relation->getUseStatement()}", $file, 1);
-	//	}
-	//
-	//	// Add the relationship.
-	//	$file = preg_replace(
-	//		'/\{(.*)\}/s', // Will select entire class contents.
-	//		'{$1' . "\n" . (string) new CompiledRelationStub($relation) . '}',
-	//		$file,
-	//		1
-	//	);
-	//
-	//	return $file;
-	//}
-
+	/**
+	 * The FileSystem.
+	 *
+	 * @return Filesystem
+	 */
 	protected function getFileSystem()
 	{
 		return $this->app['files'];
@@ -81,7 +104,7 @@ class ModelWriter
 	 *
 	 * @return string
 	 */
-	protected function getPath($name)
+	protected function getPath(string $name): string
 	{
 		$name = str_replace_first($this->rootNamespace(), '', $name);
 
@@ -93,7 +116,7 @@ class ModelWriter
 	 *
 	 * @return string
 	 */
-	protected function rootNamespace()
+	protected function rootNamespace(): string
 	{
 		return $this->app->getNamespace();
 	}

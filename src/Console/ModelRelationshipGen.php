@@ -68,9 +68,8 @@ class ModelRelationshipGen extends Command
 	 */
 	public function handle()
 	{
-		$models = ($this->argument('model')) ?
-			[$this->getQualifiedClass($this->argument('model'))] :
-			$this->getModelsFromDir($this->getModelsDir());
+		$models = $this->getModelsFromDir($this->getModelsDir());
+		$selectedModels = ($this->argument('model')) ? [$this->getQualifiedClass($this->argument('model'))] : $models;
 
 
 		// This fixes an issue with doctrine and mysql enums...
@@ -81,7 +80,7 @@ class ModelRelationshipGen extends Command
 
 		$tree = (new RelationMapper($schemaManager, $models))->map();
 
-		(new ModelWriter($this->getLaravel(), $tree, $models))->writeToFiles();
+		(new ModelWriter($this->getLaravel(), $tree, $selectedModels))->writeToFiles();
 	}
 
 	/**
