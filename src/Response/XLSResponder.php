@@ -93,11 +93,6 @@ class XLSResponder extends BaseResponder implements Responder
     {
         parent::__construct();
 
-        $this->filename = null;
-        $this->sheetname = null;
-        $this->creator = null;
-        $this->company = null;
-        $this->description = null;
         $this->excel = app('excel')->create('export');
     }
 
