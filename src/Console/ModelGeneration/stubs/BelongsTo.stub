@@ -1,0 +1,9 @@
+	/**
+	 * @see DummyRelatedToClass
+	 *
+	 * @return BelongsTo
+	 */
+	public function DummyName(): BelongsTo
+	{
+		return $this->belongsTo(DummyRelatedToClass::class, DummyParam0, DummyParam1, DummyParam2);
+	}

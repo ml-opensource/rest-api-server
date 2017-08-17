@@ -1,0 +1,31 @@
+<?php
+
+namespace DummyNamespace;
+
+use Fuzz\MagicBox\Contracts\MagicBoxResource;
+use Illuminate\Database\Eloquent\Model;
+use DummyNamespace\Utility\MagicBoxResourceHelper;
+
+class DummyClass extends Model implements MagicBoxResource
+{
+	use MagicBoxResourceHelper;
+
+	/**
+     * The database table.
+     */
+    const TABLE = 'DummyTable';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = self::TABLE;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [];
+}

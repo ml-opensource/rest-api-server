@@ -1,0 +1,107 @@
+<?php
+
+namespace DummyNamespace;
+
+use Fuzz\Data\Traits\Transformations;
+use Fuzz\Data\Transformations\Serialization\DefaultModelTransformer;
+use Fuzz\MagicBox\Contracts\Repository;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response as Respond;
+use DummyFullModelClass;
+
+
+class DummyClass extends Controller
+{
+	use Transformations;
+
+	/**
+	 * Sets this as the default transformation class.
+	 *
+	 * @var string
+	 */
+	public $transformer = DefaultModelTransformer::class;
+
+	/**
+	 * Identifies which model the EloquentRepository should use.
+	 *
+	 * @var string
+	 */
+	public static $resource = DummyModelClass::class;
+
+	/**
+	 * Get a list of records.
+	 *
+	 * @param Repository $repository
+	 * @param Request    $request
+	 *
+	 * @return JsonResponse
+	 */
+	public function getResources(Repository $repository, Request $request): JsonResponse
+	{
+		$entity = $this->getAllOrPaginatedEntities($repository, $request->get(self::PER_PAGE_KEY));
+
+		return new JsonResponse($this->transformEntity($entity), Respond::HTTP_OK);
+	}
+
+	/**
+	 * Create a new record.
+	 *
+	 * @param Repository $repository
+	 *
+	 * @return JsonResponse
+	 */
+	public function postResources(Repository $repository): JsonResponse
+	{
+		$entity = $this->createEntity($repository);
+
+		return new JsonResponse($this->transformEntity($entity), Respond::HTTP_CREATED);
+	}
+
+	/**
+	 * Return a single record by primary key.
+	 *
+	 * @param Repository $repository
+	 * @param mixed      $id
+	 *
+	 * @return JsonResponse
+	 */
+	public function getResource(Repository $repository, $id): JsonResponse
+	{
+		$entity = $this->getEntity($repository, $id);
+
+		return new JsonResponse($this->transformEntity($entity), Respond::HTTP_OK);
+	}
+
+	/**
+	 * Perform an update to the record.
+	 *
+	 * @param Repository $repository
+	 * @param mixed      $id
+	 *
+	 * @return JsonResponse
+	 */
+	public function putResource(Repository $repository, $id): JsonResponse
+	{
+		$entity = $this->updateEntity($repository, $id);
+
+		return new JsonResponse($this->transformEntity($entity), Respond::HTTP_OK);
+	}
+
+	/**
+     * Delete a record.
+     *
+     * This will always respond null, 200
+     *
+     * @param Repository $repository
+     * @param mixed      $id
+     *
+     * @return JsonResponse
+     */
+    public function deleteResource(Repository $repository, $id): JsonResponse
+    {
+        $this->deleteEntity($repository, $id);
+
+        return new JsonResponse(true, Respond::HTTP_OK);
+    }
+}

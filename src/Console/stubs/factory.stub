@@ -1,0 +1,12 @@
+<?php
+
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
+
+use Faker\Generator;
+use DummyFullModelClass;
+
+$factory->define(DummyModelClass::class, function(Generator $faker) {
+	return [
+		//
+	];
+});
