@@ -10,9 +10,9 @@
 	],
 	"require": {
 		"php": ">=7.0",
-		"fuzz/laravel-data": "dev-replace_serializations as 1.0",
-		"fuzz/laravel-oauth": "dev-feature_support_laravel_53",
-		"fuzz/magic-box": "dev-feature_support_laravel_53",
+		"fuzz/laravel-data": "1.0.x",
+		"fuzz/laravel-oauth": "1.1.x-dev as 1.1",
+		"fuzz/magic-box": "1.2.x-dev as 1.2",
 		"fuzz/http-exception": "1.0.*",
 		"laravel/framework": "5.3.*",
 		"league/csv": "^7.2@dev",
@@ -29,5 +29,6 @@
 			"Fuzz\\ApiServer\\": "src/",
 			"Fuzz\\ApiServer\\Tests\\": "tests/"
 		}
-	}
+	},
+	"minimum-stability": "stable"
 }
