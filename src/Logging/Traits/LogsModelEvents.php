@@ -1,6 +1,6 @@
 <?php
 
-namespace Fuzz\ApiServer\Traits;
+namespace Fuzz\ApiServer\Logging\Traits;
 
 use Fuzz\ApiServer\Logging\Facades\ActionLogger;
 use Fuzz\ApiServer\Logging\Contracts\ActionLoggerInterface;
@@ -22,7 +22,7 @@ trait LogsModelEvents
 	 *
 	 * @return void
 	 */
-	protected static function bootLoggableActions()
+	protected static function bootLogsModelEvents()
 	{
 		/**
 		 * Log on model creates

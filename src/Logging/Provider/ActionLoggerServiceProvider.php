@@ -20,6 +20,8 @@ class ActionLoggerServiceProvider extends ServiceProvider
 		$this->publishes([
 			$config_file => config_path('action_log.php'),
 		]);
+
+		$this->loadMigrationsFrom(realpath(__DIR__ . '/../migrations'));
 	}
 
 	/**

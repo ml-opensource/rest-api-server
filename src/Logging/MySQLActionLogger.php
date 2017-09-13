@@ -5,7 +5,7 @@ namespace Fuzz\ApiServer\Logging;
 /**
  * Class MySQLActionLogger
  *
- * The ActionLMySQLActionLoggerogger maintains a queue of messages ready to be written to a MySQL DB.
+ * The MySQLActionLogger maintains a queue of messages ready to be written to a MySQL DB.
  *
  * @package Fuzz\ApiServer\Logging
  */
@@ -24,7 +24,7 @@ class MySQLActionLogger extends BaseActionLogger
 
 		$log_model = $this->log_model;
 
-		$success = $log_model::insert($this->getMessages());
+		$success = $log_model::insert($this->getMessageQueue());
 
 		if ($success) {
 			$this->clearQueue();

@@ -3,8 +3,6 @@
 namespace Fuzz\ApiServer\Logging;
 
 use Fuzz\ApiServer\Logging\Contracts\ActionLoggerInterface;
-use Fuzz\ApiServer\Logging\Contracts\LoggableAction;
-use Fuzz\ApiServer\Logging\Contracts\LoggableError;
 use Illuminate\Http\Request;
 
 /**
@@ -26,7 +24,7 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 	/**
 	 * Message queue storage
 	 *
-	 * @var \Fuzz\ApiServer\Logging\Contracts\LoggableAction[]
+	 * @var array
 	 */
 	protected $message_queue = [];
 
@@ -92,21 +90,34 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 	/**
 	 * Log an action
 	 *
-	 * @param \Fuzz\ApiServer\Logging\Contracts\LoggableAction $event
-	 * @param array                                            $meta
+	 * @param string      $action
+	 * @param string|null $resource
+	 * @param string|null $resource_id
+	 * @param string|null $note
+	 * @param array       $meta
 	 *
 	 * @return \Fuzz\ApiServer\Logging\Contracts\ActionLoggerInterface
 	 */
-	public function log(LoggableAction $event, array $meta = []): ActionLoggerInterface
+	public function log(string $action, string $resource = null, string $resource_id = null, string $note = null, array $meta = []): ActionLoggerInterface
 	{
-		$event->setMeta($meta);
+		$event = [
+			'user_id'      => null, // Will be set later
+			'client_id'    => null, // Will be set later
+			'resource'     => $resource,
+			'resource_id'  => (string) $resource_id,
+			'action'       => $action,
+			'ip'           => $this->client_ip,
+			'meta'         => json_encode($meta),
+			'note'         => $note,
+			'error_status' => null,
+		];
 
 		if (! is_null($this->agent_id)) {
-			$event->setAgentId($this->agent_id);
+			$event['user_id'] = $this->agent_id;
 		}
 
 		if (! is_null($this->client_id)) {
-			$event->setClientId($this->client_id);
+			$event['client_id'] = $this->client_id;
 		}
 
 		$this->message_queue[] = $event;
@@ -117,24 +128,38 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 	/**
 	 * Log an error action
 	 *
+	 * @param string                                                      $action
+	 * @param string|null                                                 $resource
+	 * @param string|null                                                 $resource_id
 	 * @param \Fuzz\ApiServer\Logging\Contracts\LoggableError|null|string $error
+	 * @param string|null                                                 $note
 	 * @param array                                                       $meta
 	 *
 	 * @return \Fuzz\ApiServer\Logging\Contracts\ActionLoggerInterface
 	 */
-	public function error(LoggableError $error, array $meta = []): ActionLoggerInterface
+	public function error(string $action, string $resource = null, string $resource_id = null, string $error = null, string $note = null, array $meta = []): ActionLoggerInterface
 	{
-		$error->setMeta($meta);
+		$event = [
+			'user_id'      => null, // Will be set later
+			'client_id'    => null, // Will be set later
+			'resource'     => $resource,
+			'resource_id'  => (string) $resource_id,
+			'action'       => $action,
+			'ip'           => $this->client_ip,
+			'meta'         => json_encode($meta),
+			'note'         => $note,
+			'error_status' => $error,
+		];
 
 		if (! is_null($this->agent_id)) {
-			$error->setAgentId($this->agent_id);
+			$event['user_id'] = $this->agent_id;
 		}
 
 		if (! is_null($this->client_id)) {
-			$error->setClientId($this->client_id);
+			$event['client_id'] = $this->client_id;
 		}
 
-		$this->message_queue[] = $error;
+		$this->message_queue[] = $event;
 
 		return $this;
 	}
@@ -150,27 +175,11 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 	/**
 	 * Get the message queue
 	 *
-	 * @return \Fuzz\ApiServer\Logging\Contracts\LoggableAction[]
+	 * @return array
 	 */
 	public function getMessageQueue(): array
 	{
 		return $this->message_queue;
-	}
-
-	/**
-	 * Get all messages current in queue in array form
-	 *
-	 * @return array
-	 */
-	public function getMessages(): array
-	{
-		$messages = [];
-
-		foreach ($this->message_queue as $message) {
-			$messages[] = $message->toArray();
-		}
-
-		return $messages;
 	}
 
 	/**
@@ -213,8 +222,8 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 			return;
 		}
 
-		foreach ($this->message_queue as $i => $message) {
-			$message->setAgentId($this->agent_id);
+		foreach ($this->message_queue as $i => &$message) {
+			$message['user_id'] = $this->agent_id;
 		}
 	}
 
@@ -229,8 +238,8 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 	{
 		$this->client_id = $client_id;
 
-		foreach ($this->message_queue as $i => $message) {
-			$message->setClientId($client_id);
+		foreach ($this->message_queue as $i => &$message) {
+			$message['client_id'] = $client_id;
 		}
 
 		return $this;

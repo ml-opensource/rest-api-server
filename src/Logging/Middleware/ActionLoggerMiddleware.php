@@ -56,13 +56,35 @@ abstract class ActionLoggerMiddleware
 		ActionLogger::setClientId($this->getActionClientId());
 
 		ActionLogger::flushQueue();
+
+		return true;
 	}
 
+	/**
+	 * Determine if we should log any actions
+	 *
+	 * @return bool
+	 */
 	abstract public function shouldLogActions(): bool;
 
+	/**
+	 * Determine if this request has an action agent
+	 *
+	 * @return bool
+	 */
 	abstract public function hasActionAgent(): bool;
 
+	/**
+	 * Retrieve the current action agent's ID
+	 *
+	 * @return string
+	 */
 	abstract public function getActionAgentId(): string;
 
+	/**
+	 * Retrieve the current client's ID
+	 *
+	 * @return string
+	 */
 	abstract public function getActionClientId(): string;
 }

@@ -31,22 +31,29 @@ interface ActionLoggerInterface
 	/**
 	 * Log an action
 	 *
-	 * @param \Fuzz\ApiServer\Logging\Contracts\LoggableAction $event
-	 * @param array                                            $meta
+	 * @param string      $action
+	 * @param string|null $resource
+	 * @param string|null $resource_id
+	 * @param string|null $note
+	 * @param array       $meta
 	 *
 	 * @return \Fuzz\ApiServer\Logging\Contracts\ActionLoggerInterface
 	 */
-	public function log(LoggableAction $event, array $meta = []): ActionLoggerInterface;
+	public function log(string $action, string $resource = null, string $resource_id = null, string $note = null, array $meta = []): ActionLoggerInterface;
 
 	/**
 	 * Log an error action
 	 *
-	 * @param \Fuzz\ApiServer\Logging\Contracts\LoggableError|null|string $error
-	 * @param array                                                       $meta
+	 * @param string      $action
+	 * @param string|null $resource
+	 * @param string|null $resource_id
+	 * @param string|null $error
+	 * @param string|null $note
+	 * @param array       $meta
 	 *
 	 * @return \Fuzz\ApiServer\Logging\Contracts\ActionLoggerInterface
 	 */
-	public function error(LoggableError $error, array $meta = []): ActionLoggerInterface;
+	public function error(string $action, string $resource = null, string $resource_id = null, string $error = null, string $note = null, array $meta = []): ActionLoggerInterface;
 
 	/**
 	 * Clear the message queue
@@ -56,16 +63,9 @@ interface ActionLoggerInterface
 	/**
 	 * Get the message queue
 	 *
-	 * @return \Fuzz\ApiServer\Logging\Contracts\LoggableAction[]
-	 */
-	public function getMessageQueue(): array;
-
-	/**
-	 * Get all messages current in queue in array form
-	 *
 	 * @return array
 	 */
-	public function getMessages(): array;
+	public function getMessageQueue(): array;
 
 	/**
 	 * Get the current queue length

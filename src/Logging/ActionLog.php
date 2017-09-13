@@ -17,18 +17,28 @@ class ActionLog extends Model implements ActionLogModel
 	 *
 	 * @var array
 	 */
-	protected $casts = [ // @todo update field names
-		'created_at'     => 'datetime',
-		'updated_at'     => 'datetime',
-		'id'             => 'integer',
-		'user_id'        => 'integer',
-		'content_type'   => 'string',
-		'content_target' => 'string',
-		'action'         => 'string',
-		'timestamp'      => 'datetime',
-		'success'        => 'boolean',
-		'error'          => 'string',
-		'ip'             => 'string',
-		'meta'           => 'array',
+	protected $casts = [
+		'id'           => 'integer',
+		'created_at'   => 'datetime',
+		'user_id'      => 'integer',
+		'resource'     => 'string',
+		'resource_id'  => 'string',
+		'action'       => 'string',
+		'note'         => 'string',
+		'error_status' => 'string',
+		'ip'           => 'string',
+		'meta'         => 'array',
 	];
+
+	/**
+	 * Ignore updated at
+	 *
+	 * @param  mixed $value
+	 *
+	 * @return $this
+	 */
+	public function setUpdatedAt($value)
+	{
+		return $this;
+	}
 }

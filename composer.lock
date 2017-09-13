@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "30cf6493d3be6a4d0dcada0e7d17fab5",
+    "content-hash": "bf36865eeb5c4ea5540b400ebb77a0ba",
     "packages": [
         {
             "name": "classpreloader/classpreloader",
@@ -206,12 +206,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fuzz-productions/laravel-api-data.git",
-                "reference": "10226ec2975ef818a178e490e2d4159bda681a17"
+                "reference": "182b2f60b3917af03eb0692514f2eb075a8b2ee4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fuzz-productions/laravel-api-data/zipball/10226ec2975ef818a178e490e2d4159bda681a17",
-                "reference": "10226ec2975ef818a178e490e2d4159bda681a17",
+                "url": "https://api.github.com/repos/fuzz-productions/laravel-api-data/zipball/182b2f60b3917af03eb0692514f2eb075a8b2ee4",
+                "reference": "182b2f60b3917af03eb0692514f2eb075a8b2ee4",
                 "shasum": ""
             },
             "require": {
@@ -223,6 +223,7 @@
             },
             "require-dev": {
                 "mockery/mockery": "0.9.*",
+                "orchestra/testbench": "3.3.*",
                 "phpunit/phpunit": "~5.6"
             },
             "type": "library",
@@ -243,7 +244,7 @@
                 }
             ],
             "description": "Scaffolding package for Laravel API models and data.",
-            "time": "2017-09-11 18:01:48"
+            "time": "2017-09-12 14:05:54"
         },
         {
             "name": "fuzz/laravel-oauth",
@@ -4036,6 +4037,39 @@
                 "xunit"
             ],
             "time": "2017-06-30T09:13:00+00:00"
+        },
+        {
+            "name": "scriptfusion/phpunit-immediate-exception-printer",
+            "version": "1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ScriptFUSION/PHPUnit-Immediate-Exception-Printer.git",
+                "reference": "eecb20334dd09defe8fa6c15fce253357d7cf84e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ScriptFUSION/PHPUnit-Immediate-Exception-Printer/zipball/eecb20334dd09defe8fa6c15fce253357d7cf84e",
+                "reference": "eecb20334dd09defe8fa6c15fce253357d7cf84e",
+                "shasum": ""
+            },
+            "require": {
+                "phpunit/phpunit": "^5.5|^6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ScriptFUSION\\PHPUnitImmediateExceptionPrinter\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Bilge",
+                    "email": "bilge@scriptfusion.com"
+                }
+            ],
+            "description": "Immediately prints exception and assertion failures during testing.",
+            "time": "2017-07-29T19:55:53+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
