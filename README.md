@@ -193,6 +193,8 @@ protected $middleware = [
 ```
 1. Run the migration and log.
 
+Optionally, you can include the `\Fuzz\ApiServer\Logging\Traits\LogsModelEvents` trait in your models to log all model events.
+
 ### Generator Commands
 
 The Fuzz API Server also comes with some nifty code generation commands.
