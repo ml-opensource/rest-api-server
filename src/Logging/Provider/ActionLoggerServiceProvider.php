@@ -19,9 +19,11 @@ class ActionLoggerServiceProvider extends ServiceProvider
 		$config_file = realpath(__DIR__ . '/../config/action_log.php');
 		$this->publishes([
 			$config_file => config_path('action_log.php'),
-		]);
+		], 'config');
 
-		$this->loadMigrationsFrom(realpath(__DIR__ . '/../migrations'));
+		$this->publishes([
+			realpath(__DIR__ . '/../migrations') => database_path('/migrations')
+		], 'migrations');
 	}
 
 	/**
