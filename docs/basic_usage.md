@@ -9,17 +9,18 @@ Register a base controller extending `Fuzz\ApiServer\Routing\Controller`:
 Register routes pointing to extensions of your base controller. Make a catch-all route to send all other requests through your base controller.
 
 ```php
-    class MySpecificController extends MyBaseController
-    {
-        public function someEndpoint() {
-            return $this->succeed('Foobar!');
-        }
+class MySpecificController extends MyBaseController
+{
+    public function someEndpoint() {
+        return $this->succeed('Foobar!');
     }
+}
 
-    Route::get('some-endpoint', 'MySpecificController@someEndpoint');
-    // ...
-    Route::controller(null, 'MyBaseController');
+Route::get('some-endpoint', 'MySpecificController@someEndpoint');
+// ...
+Route::controller(null, 'MyBaseController');
 ```
+
 ## ResourceControllers
 Resource controllers extend functionality of `fuzz/magic-box` repositories and provide CRUD and authorization functionality out of the box.
 
@@ -68,51 +69,52 @@ You can then point your restful route to your custom ResourceController:
 Send mixed data:
 
 ```php
-    return $this->succeed(['foo' => 'bar']);
+return $this->succeed(['foo' => 'bar']);
 ```
 Send any arrayable data:
 
 ```php
-    return $this->succeed(Model::all());
+return $this->succeed(Model::all());
 ```
 Send any paginated data:
 
 ```php
-    return $this->succeed(Model::paginate($this->getPerPage(Model::DEFAULT_PER_PAGE)));
+return $this->succeed(Model::paginate($this->getPerPage(Model::DEFAULT_PER_PAGE)));
 ```
 Send RESTful errors with error codes and optional data:
 
 ```php
-    $this->badRequest('That button does not do what you think it does.');
-    $this->forbidden('Maybe next time.');
-    $this->notFound();
+$this->badRequest('That button does not do what you think it does.');
+$this->forbidden('Maybe next time.');
+$this->notFound();
 ```
 Raise RESTful error exceptions outside of the controller context:
 
 ```php
-	throw new Symfony\Component\HttpKernel\Exception\ConflictHttpException;
-	throw new Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-	throw new Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-	throw new Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+throw new Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+throw new Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+throw new Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+throw new Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 ```
 Require the user to provide certain parameters:
 
 ```php
-    // Magically works with either JSON or form data
-    list($foo, $bar) = $this->requireParameters('foo', 'bar');
+// Magically works with either JSON or form data
+list($foo, $bar) = $this->requireParameters('foo', 'bar');
 ```
 Read a list of certain parameters:
 
 ```php
-    list($foo, $bar) = $this->suggestParameters('foo', 'bar');
+list($foo, $bar) = $this->suggestParameters('foo', 'bar');
 ```
 Special handling (with de-duplication) for reading arrays:
 
 ```php
-    $stuff = $this->requireArrayParameter('stuff');
+$stuff = $this->requireArrayParameter('stuff');
 ```
 Handles nested JSON and form properties just fine:
 
 ```php
-    // Corresponds with {"foo": {"bar": {"id": 9}}}
-    list($foo, $bar_id) = $this->requireParameters('foo', 'foo.bar.id');
+// Corresponds with {"foo": {"bar": {"id": 9}}}
+list($foo, $bar_id) = $this->requireParameters('foo', 'foo.bar.id');
+```
