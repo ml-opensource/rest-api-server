@@ -216,7 +216,7 @@ There are two ways to use throttles:
     protected $routeMiddleware = [
         ...
         'ip-throttle'    => \Fuzz\ApiServer\Throttling\IPThrottler::class,
-        'token-throttle' => TokenThrottler::class,
+        'token-throttle' => \Fuzz\ApiServer\Throttling\TokenThrottler::class,
         ...
     ];
     ```
