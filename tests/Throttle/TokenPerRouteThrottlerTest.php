@@ -3,7 +3,7 @@
 namespace Fuzz\ApiServer\Tests\Throttle;
 
 use Fuzz\ApiServer\Tests\AppTestCase;
-use Fuzz\ApiServer\Throttling\TokenThrottler;
+use Fuzz\ApiServer\Throttling\TokenPerRouteThrottler;
 use Fuzz\HttpException\TooManyRequestsHttpException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -12,11 +12,11 @@ use LucaDegasperi\OAuth2Server\Authorizer;
 use Mockery;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
-class TokenThrottlerTest extends AppTestCase
+class TokenPerRouteThrottlerTest extends AppTestCase
 {
 	public function testItThrowsTooManyRequestsExceptionIfItAtLimit()
 	{
-		$throttler     = new TokenThrottler;
+		$throttler     = new TokenPerRouteThrottler;
 		$request       = Mockery::mock(Request::class);
 		$request_headers   = Mockery::mock(HeaderBag::class);
 		$request->headers  = $request_headers;
@@ -34,9 +34,11 @@ class TokenThrottlerTest extends AppTestCase
 			return $authorizer;
 		});
 
+		$request->shouldReceive('method')->once()->andReturn('post');
+		$request->shouldReceive('getRequestUri')->once()->andReturn('foo/bar/baz');
 		$request_headers->shouldReceive('get')->with('Authorization', null)->once()->andReturn('Bearer FooBarToken');
 
-		Redis::shouldReceive('get')->once()->with('throttle:' . hash('sha256', 'token:Bearer FooBarToken'))
+		Redis::shouldReceive('get')->once()->with('throttle:' . hash('sha256', 'token:foo/bar/baz:post:Bearer FooBarToken'))
 			->andReturn(1); // At rate limit
 
 		$this->expectException(TooManyRequestsHttpException::class);
@@ -45,7 +47,7 @@ class TokenThrottlerTest extends AppTestCase
 
 	public function testItIncrementsAndAddsHeadersIfNotAtRateLimit()
 	{
-		$throttler         = new TokenThrottler;
+		$throttler         = new TokenPerRouteThrottler;
 		$request           = Mockery::mock(Request::class);
 		$response          = Mockery::mock(Response::class);
 		$headers           = Mockery::mock(HeaderBag::class);
@@ -59,9 +61,11 @@ class TokenThrottlerTest extends AppTestCase
 		$max_attempts  = 3;
 		$decay_minutes = 1;
 
+		$request->shouldReceive('method')->once()->andReturn('post');
+		$request->shouldReceive('getRequestUri')->once()->andReturn('foo/bar/baz');
 		$request_headers->shouldReceive('get')->with('Authorization', null)->once()->andReturn('Bearer FooBarToken');
 
-		Redis::shouldReceive('get')->once()->with('throttle:' . hash('sha256', 'token:Bearer FooBarToken'))
+		Redis::shouldReceive('get')->once()->with('throttle:' . hash('sha256', 'token:foo/bar/baz:post:Bearer FooBarToken'))
 			->andReturn(1); // Not at rate limit
 		Redis::shouldReceive('incr')->once()->andReturn(2);
 		$headers->shouldReceive('add')->once()->with([
@@ -84,7 +88,7 @@ class TokenThrottlerTest extends AppTestCase
 
 		$this->expectException(TooManyRequestsHttpException::class);
 		$this->expectExceptionMessage('Too Many Requests.');
-		TokenThrottler::assertThrottle($access_token, $max_attempts, $decay_minutes);
+		TokenPerRouteThrottler::assertThrottle($access_token, $max_attempts, $decay_minutes);
 	}
 
 	public function testAssertThrottleReturnsAnArrayOfHeadersIfNotAtRateLimit()
@@ -97,7 +101,7 @@ class TokenThrottlerTest extends AppTestCase
 			->andReturn(1); // Not at rate limit
 		Redis::shouldReceive('incr')->once()->andReturn(2);
 
-		$headers = TokenThrottler::assertThrottle($access_token, $max_attempts, $decay_minutes);
+		$headers = TokenPerRouteThrottler::assertThrottle($access_token, $max_attempts, $decay_minutes);
 		$this->assertSame([
 			'X-RateLimit-Limit'     => $max_attempts,
 			'X-RateLimit-Remaining' => 1,
