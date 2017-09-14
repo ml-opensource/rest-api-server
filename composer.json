@@ -17,7 +17,8 @@
 		"fuzz/http-exception": "1.1.x-dev as 1.1",
 		"league/csv": "^7.2@dev",
 		"lucadegasperi/oauth2-server-laravel": "5.2.*",
-		"maatwebsite/excel": "^2.1"
+		"maatwebsite/excel": "^2.1",
+		"predis/predis": "^1.1"
 	},
 	"require-dev": {
 		"mockery/mockery": "0.9.*",
