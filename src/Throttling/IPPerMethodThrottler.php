@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @package Fuzz\ApiServer\Throttling
  */
-class IPThrottler extends ArbitraryStringThrottler implements Throttler
+class IPPerMethodThrottler extends ArbitraryStringThrottler implements Throttler
 {
 	/**
 	 * Throttle type key
@@ -36,6 +36,8 @@ class IPThrottler extends ArbitraryStringThrottler implements Throttler
 	public function handle(Request $request, Closure $next, int $max_attempts = 60, int $decay_minutes = 1): Response
 	{
 		$key = implode(':', [
+			$request->getRequestUri(),
+			$request->method(),
 			$request->ip(),
 		]);
 
