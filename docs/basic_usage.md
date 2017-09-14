@@ -1,18 +1,14 @@
 [Back](index.md)
 
 # Usage
-Register a base controller extending Fuzz\ApiServer\Routing\Controller:
+Register a base controller extending `Fuzz\ApiServer\Routing\Controller`:
 
 ```php
-    <?php
-
     class MyBaseController extends Fuzz\ApiServer\Routing\Controller {}
 ```
 Register routes pointing to extensions of your base controller. Make a catch-all route to send all other requests through your base controller.
 
 ```php
-    <?php
-
     class MySpecificController extends MyBaseController
     {
         public function someEndpoint() {
@@ -30,8 +26,6 @@ Resource controllers extend functionality of `fuzz/magic-box` repositories and p
 Your application should extend the base `fuzz/api-server` Resource controller:
 
 ```php
-<?php
-
 namespace MyApp\Http\Controllers;
 
 use Fuzz\ApiServer\Routing\ResourceController as BaseResourceController;
@@ -51,8 +45,6 @@ If any resources need to override the default functionality, you can create a sp
 `app/Http/Controllers/Resources/Users.php`:
 
 ```php
-<?php
-
 namespace MyApp\Http\Controllers\Resources;
 
 use Illuminate\Http\Request;
@@ -76,29 +68,21 @@ You can then point your restful route to your custom ResourceController:
 Send mixed data:
 
 ```php
-    <?php
-
     return $this->succeed(['foo' => 'bar']);
 ```
 Send any arrayable data:
 
 ```php
-    <?php
-
     return $this->succeed(Model::all());
 ```
 Send any paginated data:
 
 ```php
-    <?php
-
     return $this->succeed(Model::paginate($this->getPerPage(Model::DEFAULT_PER_PAGE)));
 ```
 Send RESTful errors with error codes and optional data:
 
 ```php
-    <?php
-
     $this->badRequest('That button does not do what you think it does.');
     $this->forbidden('Maybe next time.');
     $this->notFound();
@@ -106,8 +90,6 @@ Send RESTful errors with error codes and optional data:
 Raise RESTful error exceptions outside of the controller context:
 
 ```php
-    <?php
-
 	throw new Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 	throw new Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 	throw new Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -116,29 +98,21 @@ Raise RESTful error exceptions outside of the controller context:
 Require the user to provide certain parameters:
 
 ```php
-    <?php
-
     // Magically works with either JSON or form data
     list($foo, $bar) = $this->requireParameters('foo', 'bar');
 ```
 Read a list of certain parameters:
 
 ```php
-    <?php
-
     list($foo, $bar) = $this->suggestParameters('foo', 'bar');
 ```
 Special handling (with de-duplication) for reading arrays:
 
 ```php
-    <?php
-
     $stuff = $this->requireArrayParameter('stuff');
 ```
 Handles nested JSON and form properties just fine:
 
 ```php
-    <?php
-
     // Corresponds with {"foo": {"bar": {"id": 9}}}
     list($foo, $bar_id) = $this->requireParameters('foo', 'foo.bar.id');
