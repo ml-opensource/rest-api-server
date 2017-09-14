@@ -50,6 +50,8 @@ class BaseThrottlerTest extends AppTestCase
 
 		$throttler->setMaxAttempts(6);
 
+		Redis::shouldReceive('get')->with('someKey')->once()->andReturn(6);
+
 		$response = $throttler->getResponse('someKey');
 		$this->assertTrue($response instanceof JsonResponse);
 		$this->assertSame(429, $response->getStatusCode());
@@ -116,6 +118,8 @@ class BaseThrottlerTest extends AppTestCase
 	{
 		$throttler = new FooThrottler;
 		$throttler->setMaxAttempts(3);
+
+		Redis::shouldReceive('get')->with('foo')->once()->andReturn(0);
 
 		$this->assertSame(false, $throttler->isAtLimit('foo'));
 
