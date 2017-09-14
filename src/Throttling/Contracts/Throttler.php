@@ -57,6 +57,8 @@ interface Throttler
 	public function getMaxAttempts(): int;
 
 	/**
+	 * Set the maximum number of attempts allowed per decay time
+	 * 
 	 * @param int $max_attempts
 	 *
 	 * @return \Fuzz\ApiServer\Throttling\Contracts\Throttler
