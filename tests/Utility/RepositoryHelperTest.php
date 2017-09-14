@@ -169,7 +169,7 @@ class RepositoryHelperTest extends AppTestCase
 			['id' => 3],
 			['id' => 4],
 		];
-		$this->mockRepository->shouldReceive('getModelClass')->once()->andReturn($this->model);
+		$this->mockRepository->shouldReceive('getModelClass')->once()->andReturn(get_class($this->model));
 		$this->mockRepository->shouldReceive('getInput')->once()->andReturn($many);
 		$this->mockRepository->shouldReceive('isManyOperation')->once()->andReturn(true);
 		$this->mockRepository->shouldReceive('updateMany')->once()->andReturn(new Collection($many));
@@ -191,7 +191,7 @@ class RepositoryHelperTest extends AppTestCase
 			['name' => 'naaa'],
 			['name' => 'asdf'],
 		];
-		$this->mockRepository->shouldReceive('getModelClass')->once()->andReturn($this->model);
+		$this->mockRepository->shouldReceive('getModelClass')->once()->andReturn(get_class($this->model));
 		$this->mockRepository->shouldReceive('getInput')->once()->andReturn($invalid);
 
 		$this->expectException(JsonValidationException::class);
@@ -211,7 +211,7 @@ class RepositoryHelperTest extends AppTestCase
 			['id' => 3],
 			['id' => 4],
 		];
-		$this->mockRepository->shouldReceive('getModelClass')->once()->andReturn($this->model);
+		$this->mockRepository->shouldReceive('getModelClass')->once()->andReturn(get_class($this->model));
 		$this->mockRepository->shouldReceive('getInput')->once()->andReturn($invalid);
 		$this->mockRepository->shouldReceive('isManyOperation')->once()->andReturn(false);
 
