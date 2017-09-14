@@ -1,4 +1,4 @@
-[back](index.md)
+[Back](index.md)
 
 # Installation
 1. Require the repository in your `composer.json`

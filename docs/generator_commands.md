@@ -1,4 +1,4 @@
-[back](index.md)
+[Back](index.md)
 
 # Generator Commands
 

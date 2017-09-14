@@ -1,4 +1,4 @@
-[back](index.md)
+[Back](index.md)
 
 # Usage
 Register a base controller extending Fuzz\ApiServer\Routing\Controller:
