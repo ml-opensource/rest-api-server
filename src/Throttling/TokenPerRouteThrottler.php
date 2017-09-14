@@ -5,23 +5,25 @@ namespace Fuzz\ApiServer\Throttling;
 use Closure;
 use Fuzz\ApiServer\Throttling\Contracts\Throttler;
 use Illuminate\Http\Request;
+use League\OAuth2\Server\Exception\InvalidRequestException;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class IPThrottler
+ * Class TokenPerRouteThrottler
  *
- * IPThrottler throttles by IP.
+ * TokenPerRouteThrottler throttles by a token string, URI, and method.
  *
  * @package Fuzz\ApiServer\Throttling
  */
-class IPPerMethodThrottler extends ArbitraryStringThrottler implements Throttler
+class TokenPerRouteThrottler extends TokenThrottler implements Throttler
 {
 	/**
 	 * Throttle type key
 	 *
 	 * @const string
 	 */
-	const THROTTLE_TYPE = 'ip';
+	const THROTTLE_TYPE = 'token';
+	const TOKEN_HEADER  = 'Authorization';
 
 	/**
 	 * Throttle a request
@@ -30,15 +32,17 @@ class IPPerMethodThrottler extends ArbitraryStringThrottler implements Throttler
 	 * @param \Closure                 $next
 	 * @param int                      $max_attempts
 	 * @param int                      $decay_minutes
+	 * @param string                   $token_header
 	 *
 	 * @return \Symfony\Component\HttpFoundation\Response
+	 * @throws \League\OAuth2\Server\Exception\InvalidRequestException
 	 */
-	public function handle(Request $request, Closure $next, int $max_attempts = 60, int $decay_minutes = 1): Response
+	public function handle(Request $request, Closure $next, int $max_attempts = 60, int $decay_minutes = 1, string $token_header = self::TOKEN_HEADER): Response
 	{
 		$key = implode(':', [
 			$request->getRequestUri(),
 			$request->method(),
-			$request->ip(),
+			$this->getTokenFromRequest($request, $token_header),
 		]);
 
 		$headers = self::assertThrottle($key, $max_attempts, $decay_minutes);

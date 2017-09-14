@@ -3,7 +3,7 @@
 namespace Fuzz\ApiServer\Tests\Throttle;
 
 use Fuzz\ApiServer\Tests\AppTestCase;
-use Fuzz\ApiServer\Throttling\IPPerMethodThrottler;
+use Fuzz\ApiServer\Throttling\IPPerRouteThrottler;
 use Fuzz\HttpException\TooManyRequestsHttpException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -11,11 +11,11 @@ use Illuminate\Support\Facades\Redis;
 use Mockery;
 use Symfony\Component\HttpFoundation\HeaderBag;
 
-class IPPerMethodThrottlerTest extends AppTestCase
+class IPPerRouteThrottlerTest extends AppTestCase
 {
 	public function testItThrowsTooManyRequestsExceptionIfItAtLimit()
 	{
-		$throttler     = new IPPerMethodThrottler;
+		$throttler     = new IPPerRouteThrottler;
 		$request       = Mockery::mock(Request::class);
 		$closure       = function (Request $request) {
 			$this->fail('Should not be called.');
@@ -35,7 +35,7 @@ class IPPerMethodThrottlerTest extends AppTestCase
 
 	public function testItIncrementsAndAddsHeadersIfNotAtRateLimit()
 	{
-		$throttler         = new IPPerMethodThrottler;
+		$throttler         = new IPPerRouteThrottler;
 		$request           = Mockery::mock(Request::class);
 		$response          = Mockery::mock(Response::class);
 		$headers           = Mockery::mock(HeaderBag::class);
