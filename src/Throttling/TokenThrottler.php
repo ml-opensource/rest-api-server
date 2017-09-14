@@ -34,7 +34,7 @@ class TokenThrottler extends ArbitraryStringThrottler implements Throttler
 	 *
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
-	public function handle(Request $request, Closure $next, int $max_attempts = 5, int $decay_minutes = 1): Response
+	public function handle(Request $request, Closure $next, int $max_attempts = 60, int $decay_minutes = 1): Response
 	{
 		$key = implode(':', [
 			$request->getRequestUri(),
