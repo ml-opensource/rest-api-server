@@ -42,7 +42,6 @@ class ArbitraryStringThrottler extends BaseRedisThrottler implements Throttler
 		]);
 
 		if ($throttler->isAtLimit($key)) {
-			// @todo pull into base throttler?
 			$headers = $throttler->getHeaders($throttler->getMaxAttempts(), $throttler->getAttemptsLeft($key), $throttler->getDecaySeconds());
 			throw new TooManyRequestsHttpException($throttler->getDecaySeconds(), 'Too Many Requests.', [], self::ERROR_KEY, self::ERROR_KEY, $headers);
 		}
