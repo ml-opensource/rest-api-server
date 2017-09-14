@@ -6,12 +6,12 @@
 1. Extend the packaged exception handler for your app:
 
 ```php
-    namespace MyApp\Exceptions;
-    
-    use Fuzz\ApiServer\Exception\Handler as ExceptionHandler;
-    
-    class Handler extends ExceptionHandler
-    {
-        // ...
-    }
+namespace MyApp\Exceptions;
+
+use Fuzz\ApiServer\Exception\Handler as ExceptionHandler;
+
+class Handler extends ExceptionHandler
+{
+    // ...
+}
 ```
