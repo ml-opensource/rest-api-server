@@ -18,6 +18,8 @@ class TokenThrottlerTest extends AppTestCase
 	{
 		$throttler     = new TokenThrottler;
 		$request       = Mockery::mock(Request::class);
+		$request_headers   = Mockery::mock(HeaderBag::class);
+		$request->headers  = $request_headers;
 		$closure       = function (Request $request) {
 			$this->fail('Should not be called.');
 		};
@@ -32,9 +34,9 @@ class TokenThrottlerTest extends AppTestCase
 			return $authorizer;
 		});
 
-		$request->shouldReceive('getRequestUri')->once()->andReturn('foo/bar/baz');
-		$request->shouldReceive('method')->once()->andReturn('post');
-		Redis::shouldReceive('get')->once()->with('throttle:' . hash('sha256', 'token:foo/bar/baz:post:FooBarToken'))
+		$request_headers->shouldReceive('get')->with('Authorization', null)->once()->andReturn('Bearer FooBarToken');
+
+		Redis::shouldReceive('get')->once()->with('throttle:' . hash('sha256', 'token:Bearer FooBarToken'))
 			->andReturn(1); // At rate limit
 
 		$this->expectException(TooManyRequestsHttpException::class);
@@ -47,6 +49,8 @@ class TokenThrottlerTest extends AppTestCase
 		$request           = Mockery::mock(Request::class);
 		$response          = Mockery::mock(Response::class);
 		$headers           = Mockery::mock(HeaderBag::class);
+		$request_headers   = Mockery::mock(HeaderBag::class);
+		$request->headers  = $request_headers;
 		$response->headers = $headers;
 		$closure           = function (Request $request) use ($response) {
 			return $response;
@@ -55,17 +59,9 @@ class TokenThrottlerTest extends AppTestCase
 		$max_attempts  = 3;
 		$decay_minutes = 1;
 
-		$this->app->bind('oauth2-server.authorizer', function () {
-			$authorizer = Mockery::mock(Authorizer::class);
+		$request_headers->shouldReceive('get')->with('Authorization', null)->once()->andReturn('Bearer FooBarToken');
 
-			$authorizer->shouldReceive('getAccessToken')->once()->andReturn('FooBarToken');
-
-			return $authorizer;
-		});
-
-		$request->shouldReceive('getRequestUri')->once()->andReturn('foo/bar/baz');
-		$request->shouldReceive('method')->once()->andReturn('post');
-		Redis::shouldReceive('get')->once()->with('throttle:' . hash('sha256', 'token:foo/bar/baz:post:FooBarToken'))
+		Redis::shouldReceive('get')->once()->with('throttle:' . hash('sha256', 'token:Bearer FooBarToken'))
 			->andReturn(1); // Not at rate limit
 		Redis::shouldReceive('incr')->once()->andReturn(2);
 		$headers->shouldReceive('add')->once()->with([
