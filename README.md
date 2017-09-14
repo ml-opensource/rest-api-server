@@ -196,14 +196,14 @@ protected $middleware = [
 Optionally, you can include the `\Fuzz\ApiServer\Logging\Traits\LogsModelEvents` trait in your models to log all model events.
 
 ### Throttling
-The Throttle module provides the ability to throttle your API based on arbitrary key sets. Its backed by and required Redis.
+The Throttle module provides the ability to throttle your API based on arbitrary key sets. Its backed by and requires Redis.
 
 1. Add the service provider `\Fuzz\ApiServer\Throttling\Provider\ThrottleServiceProvider` to `config/app.php`.
 1. Publish the config `php artisan vendor:publish --provider="Fuzz\ApiServer\Throttling\Provider"`
 
 There are two ways to use throttles:
 
-#### 1. As Route Middleware
+##### 1. As Route Middleware
 1. Add the route middleware in `app/Http/Kernel.php`:
     ```php
     /**
@@ -227,7 +227,7 @@ There are two ways to use throttles:
     });
     ```
 
-#### 2. In Your Code
+##### 2. In Your Code
 Examples:
 ```php
 ArbitraryStringThrottler::assertThrottle($username, self::MAX_ATTEMPTS, self::DECAY_TIME_MINUTES);
