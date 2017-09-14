@@ -1,4 +1,4 @@
-[back](index.md)
+[Back](index.md)
 
 # Logging Actions
 The ActionLogging module provides the ability to write all actions to a store (currently MySQL). To enable logging:

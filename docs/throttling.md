@@ -1,4 +1,4 @@
-[back](index.md)
+[Back](index.md)
 
 # Throttling
 The Throttle module provides the ability to throttle your API based on arbitrary key sets. Its backed by and requires Redis.
