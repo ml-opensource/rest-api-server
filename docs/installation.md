@@ -1,16 +1,11 @@
-Laravel API Server
-==================
+[back](index.md)
 
-A framework for rapid REST API development.
-
-Read the [docs](docs/index.md).
-
-### Installation
+# Installation
 1. Require the repository in your `composer.json`
 1. Add the `ApiServerServiceProvider` to your application and publish its config `artisan vendor:publish --provider="Fuzz\ApiServer\Providers\ApiServerServiceProvider"`.
 1. Extend the packaged exception handler for your app:
 
-```
+```php
     <?php
     
     namespace MyApp\Exceptions;
@@ -22,6 +17,3 @@ Read the [docs](docs/index.md).
         // ...
     }
 ```
-
-## Usage
-Read the [docs](docs/index.md).
