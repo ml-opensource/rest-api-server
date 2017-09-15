@@ -18,7 +18,8 @@
 		"league/csv": "^7.2@dev",
 		"lucadegasperi/oauth2-server-laravel": "5.2.*",
 		"maatwebsite/excel": "^2.1",
-		"predis/predis": "^1.1"
+		"predis/predis": "^1.1",
+		"guzzlehttp/guzzle": "~6.0"
 	},
 	"require-dev": {
 		"mockery/mockery": "0.9.*",
