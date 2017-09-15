@@ -5,9 +5,10 @@ namespace Fuzz\ApiServer\Tests\Throttle;
 use Carbon\Carbon;
 use Closure;
 use Fuzz\ApiServer\Tests\AppTestCase;
-use Fuzz\ApiServer\Throttling\BaseRedisThrottler;
+use Fuzz\ApiServer\Throttling\BaseThrottler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Mockery;
 use Predis\Pipeline\Pipeline;
@@ -50,7 +51,7 @@ class BaseThrottlerTest extends AppTestCase
 
 		$throttler->setMaxAttempts(6);
 
-		Redis::shouldReceive('get')->with('someKey')->once()->andReturn(6);
+		Cache::shouldReceive('get')->with('someKey')->once()->andReturn(6);
 
 		$response = $throttler->getResponse('someKey');
 		$this->assertTrue($response instanceof JsonResponse);
@@ -64,7 +65,7 @@ class BaseThrottlerTest extends AppTestCase
 
 		$throttler->setMaxAttempts(6);
 
-		Redis::shouldReceive('incr')->once()->with('foo')->andReturn(11);
+		Cache::shouldReceive('increment')->once()->with('foo')->andReturn(11);
 
 		$this->assertSame(11, $throttler->increment('foo'));
 	}
@@ -89,7 +90,7 @@ class BaseThrottlerTest extends AppTestCase
 		$throttler = new FooThrottler;
 		$throttler->setMaxAttempts(100);
 
-		Redis::shouldReceive('get')->once()->with('foo')->andReturn(3);
+		Cache::shouldReceive('get')->once()->with('foo')->andReturn(3);
 		$this->assertSame(97, $throttler->getAttemptsLeft('foo'));
 		$this->assertSame(97, $throttler->getAttemptsLeft('foo')); // Check twice
 	}
@@ -99,16 +100,9 @@ class BaseThrottlerTest extends AppTestCase
 		$throttler = new FooThrottler;
 		$throttler->setMaxAttempts(100);
 
-		Redis::shouldReceive('get')->once()->with('foo')->andReturn(null);
+		Cache::shouldReceive('get')->once()->with('foo')->andReturn(null);
 
-		Redis::shouldReceive('pipeline')->once()->with(Mockery::on(function (Closure $closure) {
-			$pipe = Mockery::mock(Pipeline::class);
-			$pipe->shouldReceive('set')->once()->with('foo', 0);
-			$pipe->shouldReceive('expire')->once()->with('foo', 60);
-			$closure($pipe);
-
-			return true;
-		}))->andReturn([11, 1]);
+		Cache::shouldReceive('put')->with('foo', 0, 1)->once();
 
 		$this->assertSame(100, $throttler->getAttemptsLeft('foo'));
 		$this->assertSame(100, $throttler->getAttemptsLeft('foo')); // Check twice
@@ -119,30 +113,30 @@ class BaseThrottlerTest extends AppTestCase
 		$throttler = new FooThrottler;
 		$throttler->setMaxAttempts(3);
 
-		Redis::shouldReceive('get')->with('foo')->once()->andReturn(0);
+		Cache::shouldReceive('get')->with('foo')->once()->andReturn(0);
 
 		$this->assertSame(false, $throttler->isAtLimit('foo'));
 
-		Redis::shouldReceive('incr')->once()->andReturn(1);
-		Redis::shouldReceive('expire')->with('foo', 60)->once();
+		Cache::shouldReceive('increment')->once()->andReturn(1);
+		Cache::shouldReceive('put')->with('foo', 1, 1)->once();
 		$throttler->increment('foo');
 		$this->assertSame(false, $throttler->isAtLimit('foo'));
 
-		Redis::shouldReceive('incr')->once()->andReturn(2);
+		Cache::shouldReceive('increment')->once()->andReturn(2);
 		$throttler->increment('foo');
 		$this->assertSame(false, $throttler->isAtLimit('foo'));
 
-		Redis::shouldReceive('incr')->once()->andReturn(3);
+		Cache::shouldReceive('increment')->once()->andReturn(3);
 		$throttler->increment('foo');
 		$this->assertSame(true, $throttler->isAtLimit('foo'));
 
-		Redis::shouldReceive('incr')->once()->andReturn(4);
+		Cache::shouldReceive('increment')->once()->andReturn(4);
 		$throttler->increment('foo');
 		$this->assertSame(true, $throttler->isAtLimit('foo'));
 	}
 }
 
-class FooThrottler extends BaseRedisThrottler
+class FooThrottler extends BaseThrottler
 {
 
 }

@@ -12,7 +12,7 @@ use Fuzz\HttpException\TooManyRequestsHttpException;
  *
  * @package Fuzz\ApiServer\Throttling
  */
-class ArbitraryStringThrottler extends BaseRedisThrottler implements Throttler
+class ArbitraryStringThrottler extends BaseThrottler implements Throttler
 {
 	/**
 	 * Throttle type key

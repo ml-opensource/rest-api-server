@@ -7,6 +7,7 @@ use Fuzz\ApiServer\Throttling\IPPerRouteThrottler;
 use Fuzz\HttpException\TooManyRequestsHttpException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Redis;
 use Mockery;
 use Symfony\Component\HttpFoundation\HeaderBag;
@@ -26,7 +27,7 @@ class IPPerRouteThrottlerTest extends AppTestCase
 		$request->shouldReceive('ip')->once()->andReturn('127.0.0.1');
 		$request->shouldReceive('getRequestUri')->once()->andReturn('foo/bar/baz');
 		$request->shouldReceive('method')->once()->andReturn('post');
-		Redis::shouldReceive('get')->once()->with('throttle:' . hash('sha256', 'ip:foo/bar/baz:post:127.0.0.1'))
+		Cache::shouldReceive('get')->once()->with('throttle:' . hash('sha256', 'ip:foo/bar/baz:post:127.0.0.1'))
 			->andReturn(1); // At rate limit
 
 		$this->expectException(TooManyRequestsHttpException::class);
@@ -50,9 +51,9 @@ class IPPerRouteThrottlerTest extends AppTestCase
 		$request->shouldReceive('ip')->once()->andReturn('127.0.0.1');
 		$request->shouldReceive('getRequestUri')->once()->andReturn('foo/bar/baz');
 		$request->shouldReceive('method')->once()->andReturn('post');
-		Redis::shouldReceive('get')->once()->with('throttle:' . hash('sha256', 'ip:foo/bar/baz:post:127.0.0.1'))
+		Cache::shouldReceive('get')->once()->with('throttle:' . hash('sha256', 'ip:foo/bar/baz:post:127.0.0.1'))
 			->andReturn(1); // Not at rate limit
-		Redis::shouldReceive('incr')->once()->andReturn(2);
+		Cache::shouldReceive('increment')->once()->andReturn(2);
 		$headers->shouldReceive('add')->once()->with([
 			'X-RateLimit-Limit'     => 3,
 			'X-RateLimit-Remaining' => 1,

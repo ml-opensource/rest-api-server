@@ -5,8 +5,7 @@ namespace Fuzz\ApiServer\Throttling;
 use Carbon\Carbon;
 use Fuzz\ApiServer\Throttling\Contracts\Throttler;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Redis;
-use Predis\Pipeline\Pipeline;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -16,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @package Fuzz\ApiServer\Throttling
  */
-abstract class BaseRedisThrottler implements Throttler
+abstract class BaseThrottler implements Throttler
 {
 	/**
 	 * Glue for rate limit keys
@@ -77,16 +76,10 @@ abstract class BaseRedisThrottler implements Throttler
 			return $this->attempts_left;
 		}
 
-		$attempts = Redis::get($key);
+		$attempts = Cache::get($key);
 
 		if (is_null($attempts)) {
-			$decay = $this->getDecaySeconds();
-
-			// Initialize the key and set it's expiration
-			Redis::pipeline(function (Pipeline $pipe) use ($key, $decay) {
-				$pipe->set($key, 0);
-				$pipe->expire($key, $decay);
-			});
+			Cache::put($key, 0, $this->getDecayMinutes());
 
 			return $this->attempts_left = $this->getMaxAttempts();
 		}
@@ -139,11 +132,11 @@ abstract class BaseRedisThrottler implements Throttler
 	 */
 	public function increment(string $key): int
 	{
-		$attempts = Redis::incr($key);
+		$attempts = Cache::increment($key);
 
 		// Key was newly created and incremented, we should make sure its expiry is set
 		if ($attempts === 1) {
-			Redis::expire($key, $this->getDecaySeconds());
+			Cache::put($key, 1, $this->getDecayMinutes());
 		}
 
 		$this->attempts_left = $this->getMaxAttempts() - $attempts;
