@@ -37,7 +37,7 @@ class ActionLog extends Model implements ActionLogModel
 	 *
 	 * @return $this
 	 */
-	public function setUpdatedAt($value)
+	public function setUpdatedAtAttribute($value)
 	{
 		return $this;
 	}
