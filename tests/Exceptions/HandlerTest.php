@@ -7,13 +7,15 @@ use Exception;
 use Fuzz\ApiServer\Exceptions\Handler;
 use Fuzz\ApiServer\Tests\AppTestCase;
 use Fuzz\HttpException\HttpException;
+use Fuzz\HttpException\NotFoundHttpException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Symfony\Component\HttpKernel\Exception\HttpException as SymfonyHttpException;
 
 
 class HandlerTest extends AppTestCase
 {
-	public function testCanToJsonResponse()
+	public function testCanSerializeFuzzHttpExceptionToJsonResponse()
 	{
 		$handler = new HandlerStub($this->app);
 
@@ -68,6 +70,30 @@ class HandlerTest extends AppTestCase
 		$handler      = new HandlerStub($this->app);
 
 		$this->assertFalse($handler->appInDebug());
+	}
+
+	public function testItConvertsSymfonyHttpExceptionToFuzzHttpException()
+	{
+		$handler      = new HandlerStub($this->app);
+		$original_exception = new SymfonyHttpException(405, 'Some message');
+		$err = $handler->toHttpException($original_exception);
+
+		$this->assertTrue($err instanceof HttpException);
+		$this->assertSame(405, $err->getStatusCode());
+		$this->assertSame('Some message', $err->getError());
+		$this->assertSame($original_exception->getHeaders(), $err->getHttpHeaders());
+	}
+
+	public function testItConvertsModelNotFoundExceptionToFuzzHttpException()
+	{
+		$handler      = new HandlerStub($this->app);
+		$original_exception = new ModelNotFoundException;
+		$original_exception->setModel(ModelNotFoundException::class);
+		$err = $handler->toHttpException(new ModelNotFoundException);
+
+		$this->assertTrue($err instanceof NotFoundHttpException);
+		$this->assertSame('Not Found!', $err->getUserTitle());
+		$this->assertSame('Sorry, seems we can\'t find what you\'re looking for.', $err->getUserMessage());
 	}
 }
 

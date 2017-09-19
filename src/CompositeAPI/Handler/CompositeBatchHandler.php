@@ -23,7 +23,7 @@ class CompositeBatchHandler implements CompositeHandler
 	 *
 	 * @const array
 	 */
-	const DEFAULT_OPTIONS = ['http_errors' => false];
+	const DEFAULT_OPTIONS = ['http_errors' => false, 'timeout' => 10];
 
 	/**
 	 * @var \Fuzz\ApiServer\CompositeAPI\Contracts\CompositeRequest[]
@@ -108,12 +108,18 @@ class CompositeBatchHandler implements CompositeHandler
 		// Send all the requests async
 		foreach ($this->requests as $request) {
 			$guzzle_request = $this->toGuzzleRequest($request);
+			$request_uri = $request->getURI();
 
-			$this->await[$request->getURI()] = $this->getClient()->sendAsync($guzzle_request, self::DEFAULT_OPTIONS)
-				->then(function ($response) use ($request) {
-					unset($this->await[$request->getURI()]);
+			$this->await[$request_uri] = $this->getClient()
+				->sendAsync($guzzle_request, self::DEFAULT_OPTIONS)
+				->then(function ($response) use ($request, $request_uri) {
+					unset($this->await[$request_uri]);
 
-					$this->responses[$request->getURI()] = $this->readResponse($response);
+					$response = $this->readResponse($response)->setUri($request_uri);
+
+					$this->responses[$request_uri] = $response;
+				})->otherwise(function ($err) {
+					// @todo need to handle this case
 				});
 		}
 
@@ -133,6 +139,18 @@ class CompositeBatchHandler implements CompositeHandler
 	public function getResponses(): array
 	{
 		return $this->responses;
+	}
+
+	/**
+	 * Read each response
+	 *
+	 * @return array
+	 */
+	public function readResponses(): array
+	{
+		return array_map(function ($item) {
+			return $item->toArray();
+		}, $this->responses);
 	}
 
 	/**
