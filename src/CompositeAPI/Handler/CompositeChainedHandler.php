@@ -9,14 +9,24 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Arr;
 
 /**
- * Class CompositeBatchHandler
+ * Class CompositeChainedHandler
  *
- * The CompositeBatchHandler runs parallel HTTP requests asynchronously.
+ * The CompositeChainedHandler runs HTTP requests in order.
  *
  * @package Fuzz\ApiServer\CompositeAPI\Handler
  */
 class CompositeChainedHandler extends CompositeBatchHandler implements CompositeHandler
 {
+	/**
+	 * Regex for tokens in chain requests
+	 *
+	 * @const string
+	 */
+	const CHAIN_TOKEN_REGEX = '/\%{([^}]+)}/';
+	const TOKEN_START       = '%{';
+	const TOKEN_END         = '}';
+	const VALUE_NOT_EXISTS  = 'CompositeChainedHandler.VALUE_NOT_EXISTS';
+
 	/**
 	 * The head of the linked list of requests
 	 *
@@ -71,13 +81,16 @@ class CompositeChainedHandler extends CompositeBatchHandler implements Composite
 		$current = $this->head;
 
 		while (! is_null($current)) {
+			$original_uri = $current->getURI();
+
 			$this->parseTokensIntoRequest($current);
 
 			$guzzle_request = $this->toGuzzleRequest($current);
 
-			$response = $this->readResponse($this->sendRequest($guzzle_request));
+			$response = $this->readResponse($this->sendRequest($guzzle_request))
+				->setUri($original_uri);
 
-			$this->responses[$current->getURI()] = $response;
+			$this->responses[$current->referenceId()] = $response;
 			$this->reference_data[$current->referenceId()] = json_decode($response->getContent(), true);
 
 			$current = $current->next();
@@ -108,7 +121,9 @@ class CompositeChainedHandler extends CompositeBatchHandler implements Composite
 		$request->setURI($this->parseDataIntoTokens($request->getURI(), $this->reference_data));
 
 		if ($request->hasContent()) {
-			$request->setContent($this->parseDataIntoTokens($request->getContent(), $this->reference_data));
+			$parsed = $this->parseDataIntoTokens($request->getContent(), $this->reference_data);
+
+			$request->setContent($parsed);
 		}
 	}
 
@@ -123,7 +138,7 @@ class CompositeChainedHandler extends CompositeBatchHandler implements Composite
 	protected function parseDataIntoTokens(string $subject, array $data): string
 	{
 		$matches = [];
-		$found = preg_match_all('/\${([^}]+)}/', $subject, $matches);
+		$found = preg_match_all(self::CHAIN_TOKEN_REGEX, $subject, $matches);
 
 		if ($found === 0) {
 			return $subject;
@@ -138,9 +153,13 @@ class CompositeChainedHandler extends CompositeBatchHandler implements Composite
 				continue;
 			}
 
-			$value = Arr::get($data, $path); // @todo what to do if not exists? check exists first? Have a meaningful non-null default?
+			$value = Arr::get($data, $path, self::VALUE_NOT_EXISTS);
 
-			$subject = str_replace('${' . $path . '}', $value, $subject);
+			if ($value === self::VALUE_NOT_EXISTS) {
+				throw new \RuntimeException("Value at $path does not exist."); // @todo is this the desired behavior?
+			}
+
+			$subject = str_replace(self::TOKEN_START . $path . self::TOKEN_END, $value, $subject);
 		}
 
 		return $subject;

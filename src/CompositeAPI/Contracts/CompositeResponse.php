@@ -2,6 +2,9 @@
 
 namespace Fuzz\ApiServer\CompositeAPI\Contracts;
 
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+
 /**
  * Interface CompositeResponse
  *
@@ -10,14 +13,21 @@ namespace Fuzz\ApiServer\CompositeAPI\Contracts;
  *
  * @package Fuzz\ApiServer\CompositeAPI\Contracts
  */
-interface CompositeResponse
+interface CompositeResponse extends Jsonable, Arrayable
 {
 	/**
 	 * Get the response content
 	 *
 	 * @return string
 	 */
-	public function getContent(): string;
+	public function getContent(): string; // @todo to array?
+
+	/**
+	 * Get the response json serialized to an array
+	 *
+	 * @return array
+	 */
+	public function getSerializedContent(): array;
 
 	/**
 	 * Set the response content
@@ -59,4 +69,20 @@ interface CompositeResponse
 	 * @return \Fuzz\ApiServer\CompositeAPI\Contracts\CompositeResponse
 	 */
 	public function setHeaders(array $headers): CompositeResponse;
+
+	/**
+	 * Access the URI
+	 *
+	 * @return string
+	 */
+	public function getUri(): string;
+
+	/**
+	 * Set the URI
+	 *
+	 * @param string $uri
+	 *
+	 * @return \Fuzz\ApiServer\CompositeAPI\Contracts\CompositeResponse
+	 */
+	public function setUri(string $uri): CompositeResponse;
 }
