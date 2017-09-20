@@ -5,9 +5,11 @@ namespace Fuzz\ApiServer\CompositeAPI\Handler;
 use Fuzz\ApiServer\CompositeAPI\Http\CompositeGuzzleResponse;
 use Fuzz\ApiServer\CompositeAPI\Contracts\CompositeHandler;
 use Fuzz\ApiServer\CompositeAPI\Contracts\CompositeRequest;
+use Fuzz\ApiServer\CompositeAPI\Http\FailedResponse;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class CompositeBatchHandler
@@ -112,14 +114,15 @@ class CompositeBatchHandler implements CompositeHandler
 
 			$this->await[$request_uri] = $this->getClient()
 				->sendAsync($guzzle_request, self::DEFAULT_OPTIONS)
-				->then(function ($response) use ($request, $request_uri) {
+				->then(function (ResponseInterface $response) use ($request, $request_uri) {
 					unset($this->await[$request_uri]);
 
 					$response = $this->readResponse($response)->setUri($request_uri);
 
 					$this->responses[$request_uri] = $response;
-				})->otherwise(function ($err) {
-					// @todo need to handle this case
+				})->otherwise(function (\Exception $err) use ($request_uri) {
+					$this->responses[$request_uri] = (new FailedResponse($err->getMessage()))
+						->setUri($request_uri);
 				});
 		}
 
@@ -170,15 +173,14 @@ class CompositeBatchHandler implements CompositeHandler
 	/**
 	 * Read a Guzzle response into a CompositeResponse
 	 *
-	 * @param \GuzzleHttp\Psr7\Response $response
+	 * @param \Psr\Http\Message\ResponseInterface $response
 	 *
 	 * @return \Fuzz\ApiServer\CompositeAPI\Contracts\CompositeResponse
 	 */
-	protected function readResponse(Response $response)
+	protected function readResponse(ResponseInterface $response)
 	{
 		$composite_response = new CompositeGuzzleResponse;
 
-		// @todo add factory
 		return $composite_response->setStatusCode($response->getStatusCode())
 			->setContent($response->getBody())
 			->setHeaders($response->getHeaders());

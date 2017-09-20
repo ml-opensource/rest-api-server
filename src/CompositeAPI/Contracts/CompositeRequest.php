@@ -59,7 +59,7 @@ interface CompositeRequest
 	 *
 	 * @return mixed
 	 */
-	public function getContent(): string; // @todo nullable string return
+	public function getContent(): string;
 
 	/**
 	 * Set the request method

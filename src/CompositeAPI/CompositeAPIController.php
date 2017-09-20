@@ -15,9 +15,7 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class ArbitraryStringThrottler
- *
- * ArbitraryStringThrottler throttles by an arbitrary string key.
+ * Class CompositeAPIController
  *
  * @package Fuzz\ApiServer\Throttling
  */
@@ -32,7 +30,7 @@ class CompositeAPIController extends Controller
 		'*.method' => 'required|string|in:get,put,post,patch,delete',
 		'*.body'   => 'array',
 	];
-	const CHAIN_VALIDATION = [
+	const CHAIN_VALIDATION    = [
 		'*.method' => 'required|string|in:get,put,post,patch,delete',
 		'*.body'   => 'array',
 		'*.ref'    => 'string|distinct',
@@ -47,7 +45,7 @@ class CompositeAPIController extends Controller
 	 */
 	public function parallel(Request $request): Response
 	{
-		$input = $request->all();
+		$input     = $request->all();
 		$validator = Validator::make($input, self::PARALLEL_VALIDATION);
 
 		if ($validator->fails()) {
@@ -56,11 +54,10 @@ class CompositeAPIController extends Controller
 
 		$headers = $this->cleanRequestHeaders($request->headers);
 
-		$handler = new CompositeBatchHandler('https://api-dev.ecall.otis.com/'); // @todo decide how to whitelist? or fill in from APP_URL?
+		$handler = new CompositeBatchHandler(config('app.url'));
 
 		foreach ($input as $uri => $options) {
-			$sub_request = (new CompositeGuzzleRequest)->setURI($uri)
-				->setHeaders($headers)
+			$sub_request = (new CompositeGuzzleRequest)->setURI($uri)->setHeaders($headers)
 				->setMethod($options['method']);
 
 			if (isset($options['body'])) {
@@ -70,8 +67,7 @@ class CompositeAPIController extends Controller
 			$handler->addRequest($sub_request);
 		}
 
-		$responses = $handler->run()
-			->readResponses();
+		$responses = $handler->run()->readResponses();
 
 		return new JsonResponse($responses);
 	}
@@ -85,7 +81,7 @@ class CompositeAPIController extends Controller
 	 */
 	public function chain(Request $request): Response
 	{
-		$input = $request->all();
+		$input     = $request->all();
 		$validator = Validator::make($input, self::CHAIN_VALIDATION);
 
 		if ($validator->fails()) {
@@ -94,13 +90,11 @@ class CompositeAPIController extends Controller
 
 		$headers = $this->cleanRequestHeaders($request->headers);
 
-		$handler = new CompositeChainedHandler('https://api-dev.ecall.otis.com/');// @todo decide how to whitelist? or fill in from APP_URL?
+		$handler = new CompositeChainedHandler(config('app.url'));
 
 		foreach ($input as $uri => $options) {
-			$sub_request = (new CompositeChainedRequest)->setReferenceId($options['ref'])
-				->setURI($uri)
-				->setHeaders($headers)
-				->setMethod($options['method']);
+			$sub_request = (new CompositeChainedRequest)->setReferenceId($options['ref'])->setURI($uri)
+				->setHeaders($headers)->setMethod($options['method']);
 
 			if (isset($options['body'])) {
 				$sub_request->setContent(json_encode($options['body']));
@@ -109,8 +103,7 @@ class CompositeAPIController extends Controller
 			$handler->addRequest($sub_request);
 		}
 
-		$responses = $handler->run()
-			->readResponses();
+		$responses = $handler->run()->readResponses();
 
 		return new JsonResponse($responses);
 	}
