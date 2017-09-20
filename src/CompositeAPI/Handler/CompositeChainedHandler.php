@@ -82,6 +82,7 @@ class CompositeChainedHandler extends CompositeBatchHandler implements Composite
 
 		while (! is_null($current)) {
 			$original_uri = $current->getURI();
+			$reference_id = $current->referenceId();
 
 			$this->parseTokensIntoRequest($current);
 
@@ -90,8 +91,8 @@ class CompositeChainedHandler extends CompositeBatchHandler implements Composite
 			$response = $this->readResponse($this->sendRequest($guzzle_request))
 				->setUri($original_uri);
 
-			$this->responses[$current->referenceId()] = $response;
-			$this->reference_data[$current->referenceId()] = json_decode($response->getContent(), true);
+			$this->responses[$reference_id]      = $response;
+			$this->reference_data[$reference_id] = json_decode($response->getContent(), true);
 
 			$current = $current->next();
 		}
