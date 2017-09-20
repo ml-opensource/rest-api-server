@@ -20,7 +20,7 @@ interface CompositeResponse extends Jsonable, Arrayable
 	 *
 	 * @return string
 	 */
-	public function getContent(): string; // @todo to array?
+	public function getContent(): string;
 
 	/**
 	 * Get the response json serialized to an array
