@@ -21,7 +21,7 @@ class ActionLoggerMiddlewareTest extends AppTestCase
 	{
 		parent::getEnvironmentSetUp($app);
 
-		$app['config']->set('action_logger', [
+		$app['config']->set('action_log', [
 			'enabled' => true,
 		]);
 	}

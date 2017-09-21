@@ -45,7 +45,7 @@ class LogsModelEventsTest extends AppTestCase
 			]
 		);
 
-		$app['config']->set('action_logger', [
+		$app['config']->set('action_log', [
 			'enabled' => true,
 		]);
 	}
