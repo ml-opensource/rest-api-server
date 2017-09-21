@@ -1,7 +1,7 @@
 [Back](index.md)
 
 # Throttling
-The Throttle module provides the ability to throttle your API based on arbitrary key sets. Its backed by and requires Redis.
+The Throttle module provides the ability to throttle your API based on arbitrary key sets. Its backed by and requires Redis. 
 
 1. Add the service provider `\Fuzz\ApiServer\Throttling\Provider\ThrottleServiceProvider` to `config/app.php`.
 1. Publish the config `php artisan vendor:publish --provider="Fuzz\ApiServer\Throttling\Provider"`
