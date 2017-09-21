@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Mockery;
 
-class LoggableActionsTest extends AppTestCase
+class LogsModelEventsTest extends AppTestCase
 {
 	protected function getPackageProviders($app)
 	{
@@ -45,7 +45,7 @@ class LoggableActionsTest extends AppTestCase
 			]
 		);
 
-		$app['config']->set('services.action_logger', [
+		$app['config']->set('action_logger', [
 			'enabled' => true,
 		]);
 	}
