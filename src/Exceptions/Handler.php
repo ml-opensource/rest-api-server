@@ -8,6 +8,7 @@ use Fuzz\HttpException\NotFoundHttpException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
+use League\OAuth2\Server\Exception\OAuthException;
 use Symfony\Component\HttpKernel\Exception\HttpException as SymfonyHttpException;
 
 class Handler extends ExceptionHandler
@@ -86,6 +87,8 @@ class Handler extends ExceptionHandler
 			return $err;
 		} elseIf ($err instanceof SymfonyHttpException) {
 			return $this->convertSymfonyHttpException($err);
+		} elseIf ($err instanceof OAuthException) {
+			return $this->convertOAuthException($err);
 		} elseif ($err instanceof ModelNotFoundException) {
 			return $this->convertFromModelNotFound($err);
 		}
@@ -103,6 +106,20 @@ class Handler extends ExceptionHandler
 	protected function convertSymfonyHttpException(SymfonyHttpException $err)
 	{
 		return new HttpException($err->getStatusCode(), $err->getMessage(), null, [], null, null, $err->getHeaders(), $err);
+	}
+
+	/**
+	 * Converts a OAuthh Exception into a Fuzz HttpException
+	 *
+	 * @param \League\OAuth2\Server\Exception\OAuthException $err
+	 *
+	 * @return \Fuzz\HttpException\HttpException
+	 */
+	protected function convertOAuthException(OAuthException $err)
+	{
+		$error = snake_case(str_replace('Exception', '', class_basename($err)));
+
+		return new HttpException($err->httpStatusCode, $error, $err->getMessage(), [], null, null, $err->getHttpHeaders(), $err);
 	}
 
 	/**
