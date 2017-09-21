@@ -2,15 +2,14 @@
 
 namespace Fuzz\ApiServer\Exceptions;
 
-
 use Exception;
 use Fuzz\HttpException\HttpException;
 use Fuzz\HttpException\NotFoundHttpException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\JsonResponse;
-
+use League\OAuth2\Server\Exception\OAuthException;
+use Symfony\Component\HttpKernel\Exception\HttpException as SymfonyHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -84,25 +83,43 @@ class Handler extends ExceptionHandler
 	 */
 	protected function toHttpException(Exception $err): HttpException
 	{
-		$errClass = get_class($err);
-
-		switch ($errClass) {
-			case HttpException::class:
-				$httpErr = $err;
-				break;
-
-			// 404 Model not found.
-			case ModelNotFoundException::class:
-				$httpErr = $this->convertFromModelNotFound($err);
-				break;
-
-			case QueryException::class:
-			default:
-				$httpErr = $this->defaultHttpException();
-				break;
+		if ($err instanceof HttpException) {
+			return $err;
+		} elseIf ($err instanceof SymfonyHttpException) {
+			return $this->convertSymfonyHttpException($err);
+		} elseIf ($err instanceof OAuthException) {
+			return $this->convertOAuthException($err);
+		} elseif ($err instanceof ModelNotFoundException) {
+			return $this->convertFromModelNotFound($err);
 		}
 
-		return $httpErr;
+		return $this->defaultHttpException();
+	}
+
+	/**
+	 * Converts a Symfony HttpException into a Fuzz HttpException
+	 *
+	 * @param \Symfony\Component\HttpKernel\Exception\HttpException $err
+	 *
+	 * @return \Fuzz\HttpException\HttpException
+	 */
+	protected function convertSymfonyHttpException(SymfonyHttpException $err)
+	{
+		return new HttpException($err->getStatusCode(), $err->getMessage(), null, [], null, null, $err->getHeaders(), $err);
+	}
+
+	/**
+	 * Converts a OAuthh Exception into a Fuzz HttpException
+	 *
+	 * @param \League\OAuth2\Server\Exception\OAuthException $err
+	 *
+	 * @return \Fuzz\HttpException\HttpException
+	 */
+	protected function convertOAuthException(OAuthException $err)
+	{
+		$error = snake_case(str_replace('Exception', '', class_basename($err)));
+
+		return new HttpException($err->httpStatusCode, $error, $err->getMessage(), [], null, null, $err->getHttpHeaders(), $err);
 	}
 
 	/**
@@ -120,9 +137,9 @@ class Handler extends ExceptionHandler
 			'ids'   => $err->getIds(),
 		];
 		$userTitle        = 'Not Found!';
-		$userMessage      = 'Sorry, seems we can\'t find what you\'re looking for';
+		$userMessage      = 'Sorry, seems we can\'t find what you\'re looking for.';
 
-		return new NotFoundHttpException($errorDescription, $errorData, $userTitle, $userMessage, $err);
+		return new NotFoundHttpException($errorDescription, $errorData, $userTitle, $userMessage, [], $err);
 	}
 
 	/**

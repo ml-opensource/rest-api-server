@@ -75,6 +75,20 @@ class ActionLoggerMiddlewareTest extends AppTestCase
 
 		$this->assertTrue($middleware->terminate($request_mock, $response_mock));
 	}
+
+	public function testItDoesNotSetActionClientIfNotHasActionClient()
+	{
+		$request_mock  = Mockery::mock(Request::class);
+		$response_mock = Mockery::mock(Response::class);
+		$middleware = new ActionLoggerMiddlewareImplDoesNotHaveClient;
+
+		ActionLogger::shouldReceive('isEnabled')->once()->andReturn(true);
+		ActionLogger::shouldReceive('setActionAgentId')->with('someAgentId')->once();
+		ActionLogger::shouldReceive('setClientId')->never();
+		ActionLogger::shouldReceive('flushQueue')->once()->andReturn(true);
+
+		$this->assertTrue($middleware->terminate($request_mock, $response_mock));
+	}
 }
 
 class ActionLoggerMiddlewareImplShouldLogHasAgent extends ActionLoggerMiddleware
@@ -117,6 +131,69 @@ class ActionLoggerMiddlewareImplShouldLogHasAgent extends ActionLoggerMiddleware
 	public function getActionClientId(): string
 	{
 		return 'someClientId';
+	}
+
+	/**
+	 * Determine if this request has an action agent
+	 *
+	 * @return bool
+	 */
+	public function hasActionClient(): bool
+	{
+		return true;
+	}
+}
+
+class ActionLoggerMiddlewareImplDoesNotHaveClient extends ActionLoggerMiddleware
+{
+	/**
+	 * Determine if we should log any actions
+	 *
+	 * @return bool
+	 */
+	public function shouldLogActions(): bool
+	{
+		return true;
+	}
+
+	/**
+	 * Determine if this request has an action agent
+	 *
+	 * @return bool
+	 */
+	public function hasActionAgent(): bool
+	{
+		return true;
+	}
+
+	/**
+	 * Retrieve the current action agent's ID
+	 *
+	 * @return string
+	 */
+	public function getActionAgentId(): string
+	{
+		return 'someAgentId';
+	}
+
+	/**
+	 * Retrieve the current client's ID
+	 *
+	 * @return string
+	 */
+	public function getActionClientId(): string
+	{
+		throw new \LogicException('Should not be called.');
+	}
+
+	/**
+	 * Determine if this request has an action agent
+	 *
+	 * @return bool
+	 */
+	public function hasActionClient(): bool
+	{
+		return false;
 	}
 }
 
@@ -161,6 +238,16 @@ class ActionLoggerMiddlewareImplShouldLogDoesNotHaveAgent extends ActionLoggerMi
 	{
 		return 'someClientId';
 	}
+
+	/**
+	 * Determine if this request has an action agent
+	 *
+	 * @return bool
+	 */
+	public function hasActionClient(): bool
+	{
+		return true;
+	}
 }
 
 class ActionLoggerMiddlewareImplShouldNotLog extends ActionLoggerMiddleware
@@ -201,6 +288,16 @@ class ActionLoggerMiddlewareImplShouldNotLog extends ActionLoggerMiddleware
 	 * @return string
 	 */
 	public function getActionClientId(): string
+	{
+		throw new \LogicException('Should not be called.');
+	}
+
+	/**
+	 * Determine if this request has an action agent
+	 *
+	 * @return bool
+	 */
+	public function hasActionClient(): bool
 	{
 		throw new \LogicException('Should not be called.');
 	}
