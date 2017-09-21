@@ -34,7 +34,7 @@ class ActionLoggerServiceProvider extends ServiceProvider
 	public function register()
 	{
 		$this->app->singleton(ActionLogger::class, function () {
-			return new MySQLActionLogger(config('services.action_logger'), Request::instance());
+			return new MySQLActionLogger(config('action_logger'), Request::instance());
 		});
 	}
 }
