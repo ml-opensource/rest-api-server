@@ -72,10 +72,11 @@ class ModelRelationshipGen extends Command
 		$selectedModels = ($this->argument('model')) ? [$this->getQualifiedClass($this->argument('model'))] : $models;
 
 
-		// This fixes an issue with doctrine and mysql enums...
+		// This fixes an issue with doctrine and mysql enums and json...
 		$connection = $this->manager->connection()->getDoctrineConnection();
 		$platform   = $connection->getDatabasePlatform();
 		$platform->registerDoctrineTypeMapping('enum', 'string');
+		$platform->registerDoctrineTypeMapping('json', 'json_array');
 		$schemaManager = $this->manager->connection()->getDoctrineSchemaManager();
 
 		$tree = (new RelationMapper($schemaManager, $models))->map();
