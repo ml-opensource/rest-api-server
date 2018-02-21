@@ -7,6 +7,7 @@ A framework for rapid REST API development.
 * [Installation](installation.md)
 * [Basic Usage](basic_usage.md)
 * [CORS](cors.md)
+* [Tracing Requests](request_trace.md)
 * [Logging Actions](logging_actions.md)
 * [Composite API](composite_api.md)
 * [Throtttling](throttling.md)
