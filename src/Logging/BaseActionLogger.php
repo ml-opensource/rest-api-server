@@ -3,6 +3,7 @@
 namespace Fuzz\ApiServer\Logging;
 
 use Fuzz\ApiServer\Logging\Contracts\ActionLoggerInterface;
+use Fuzz\ApiServer\RequestTrace\Facades\RequestTracer;
 use Illuminate\Http\Request;
 
 /**
@@ -64,6 +65,13 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 	protected $log_model;
 
 	/**
+	 * Request ID storage
+	 *
+	 * @var string|null
+	 */
+	protected $request_id;
+
+	/**
 	 * ActionLogLogger constructor.
 	 *
 	 * @param array                    $config
@@ -101,8 +109,10 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 	public function log(string $action, string $resource = null, string $resource_id = null, string $note = null, array $meta = []): ActionLoggerInterface
 	{
 		$event = [
-			'user_id'      => null, // Will be set later
-			'client_id'    => null, // Will be set later
+			'user_id'      => null,
+			// Will be set later
+			'client_id'    => null,
+			// Will be set later
 			'resource'     => $resource,
 			'resource_id'  => (string) $resource_id,
 			'action'       => $action,
@@ -140,8 +150,10 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 	public function error(string $action, string $resource = null, string $resource_id = null, string $error = null, string $note = null, array $meta = []): ActionLoggerInterface
 	{
 		$event = [
-			'user_id'      => null, // Will be set later
-			'client_id'    => null, // Will be set later
+			'user_id'      => null,
+			// Will be set later
+			'client_id'    => null,
+			// Will be set later
 			'resource'     => $resource,
 			'resource_id'  => (string) $resource_id,
 			'action'       => $action,
@@ -179,7 +191,14 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 	 */
 	public function getMessageQueue(): array
 	{
-		return $this->message_queue;
+		$this->loadRequestId();
+
+		// Apply the request ID retroactively, if it is set
+		return array_map(function (array $event) {
+			$event['request_id'] = $this->request_id;
+
+			return $event;
+		}, $this->message_queue);
 	}
 
 	/**
@@ -243,6 +262,16 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 		}
 
 		return $this;
+	}
+
+	/**
+	 * Load and store the Request ID
+	 */
+	protected function loadRequestId()
+	{
+		if (app()->bound(RequestTracer::class)) {
+			$this->request_id = RequestTracer::getRequestId();
+		}
 	}
 
 	/**

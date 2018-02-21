@@ -133,6 +133,7 @@ class MySQLActionLoggerTest extends AppTestCase
 			$table->string('resource')->nullable();
 			$table->string('resource_id')->nullable();
 			$table->string('action');
+			$table->string('request_id')->nullable();
 			$table->string('error_status')->nullable();
 			$table->text('note')->nullable();
 			$table->string('ip');

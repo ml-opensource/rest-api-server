@@ -3,6 +3,8 @@
 namespace Fuzz\ApiServer\Tests\Logging;
 
 use Fuzz\ApiServer\Logging\BaseActionLogger;
+use Fuzz\ApiServer\RequestTrace\Facades\RequestTracer;
+use Fuzz\ApiServer\Tests\AppTestCase;
 use Fuzz\ApiServer\Tests\TestCase;
 use Illuminate\Http\Request;
 use Mockery;
@@ -12,7 +14,7 @@ use Mockery;
  *
  * @package Fuzz\ApiServer\Tests\Logging
  */
-class BaseActionLoggerTest extends TestCase
+class BaseActionLoggerTest extends AppTestCase
 {
 	public function testItSetsLoggingEnabled()
 	{
@@ -56,6 +58,7 @@ class BaseActionLoggerTest extends TestCase
 			'meta'         => json_encode(['foo' => 'bar']),
 			'note'         => 'someNote',
 			'error_status' => null,
+			'request_id' => null
 		], $logger->getMessageQueue()[0]);
 	}
 
@@ -84,6 +87,7 @@ class BaseActionLoggerTest extends TestCase
 			'meta'         => json_encode(['foo' => 'bar']),
 			'note'         => 'someNote',
 			'error_status' => null,
+			'request_id' => null
 		], $logger->getMessageQueue()[0]);
 	}
 
@@ -112,6 +116,7 @@ class BaseActionLoggerTest extends TestCase
 			'meta'         => json_encode(['foo' => 'bar']),
 			'note'         => 'someNote',
 			'error_status' => null,
+			'request_id' => null
 		], $logger->getMessageQueue()[0]);
 	}
 
@@ -138,6 +143,7 @@ class BaseActionLoggerTest extends TestCase
 			'meta'         => json_encode(['foo' => 'bar']),
 			'note'         => 'someNote',
 			'error_status' => null,
+			'request_id' => null
 		], $logger->getMessageQueue()[0]);
 
 		$logger->setActionAgentId('890');
@@ -168,6 +174,7 @@ class BaseActionLoggerTest extends TestCase
 			'meta'         => json_encode(['foo' => 'bar']),
 			'note'         => 'someNote',
 			'error_status' => null,
+			'request_id' => null
 		], $logger->getMessageQueue()[0]);
 
 		$logger->setClientId('890');
@@ -198,11 +205,48 @@ class BaseActionLoggerTest extends TestCase
 			'meta'         => json_encode(['foo' => 'bar']),
 			'note'         => 'someNote',
 			'error_status' => null,
+			'request_id' => null
 		], $logger->getMessageQueue()[0]);
 
 		$logger->clearQueue();
 
 		$this->assertSame(0, $logger->getQueueLength());
+	}
+
+	public function testItRetroactivelyAppliesRequestId()
+	{
+		$request = Mockery::mock(Request::class);
+		$request->shouldReceive('ip')->once()->andReturn('52.34.56.12');
+		$config = [
+			'enabled' => true,
+		];
+
+		app()->bind(RequestTracer::class, function () {
+			return new class {
+				public function getRequestId()
+				{
+					return 'someRequestId';
+				}
+			};
+		});
+
+		$logger = new TestLoggerImplementation($config, $request);
+
+		$logger->log('someAction', 'someResource', 'someResourceId', 'someNote', ['foo' => 'bar']);
+
+		$this->assertSame(1, $logger->getQueueLength());
+		$this->assertSame([
+			'user_id'      => null,
+			'client_id'    => null,
+			'resource'     => 'someResource',
+			'resource_id'  => 'someResourceId',
+			'action'       => 'someAction',
+			'ip'           => '52.34.56.12',
+			'meta'         => json_encode(['foo' => 'bar']),
+			'note'         => 'someNote',
+			'error_status' => null,
+			'request_id' => 'someRequestId',
+		], $logger->getMessageQueue()[0]);
 	}
 }
 
