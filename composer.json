@@ -9,7 +9,7 @@
 		}
 	],
 	"require": {
-		"php": ">=7.0",
+		"php": ">=7.2",
 		"laravel/framework": "5.1.* || 5.2.* || 5.3.* || 5.4.* || 5.5.*",
 		"fuzz/laravel-data": "1.2.x-dev as 1.2",
 		"fuzz/laravel-oauth": "1.2.x-dev as 1.2",
