@@ -37,7 +37,33 @@ class RequestTraceMiddlewareTest extends AppTestCase
 		$this->assertSame('fooId', RequestTracer::getRequestId());
 	}
 
-	public function testItSetUUIDIfAwsHeaderIsNotSet()
+	public function testItReadsFuzzTraceHeader()
+	{
+		$middleware = new RequestTraceMiddleware;
+		$closure = function () {
+			$response = Mockery::mock(Response::class);
+			$response_headers = Mockery::mock(HeaderBag::class);
+			$response->headers = $response_headers;
+
+			$response_headers->shouldReceive('set')->with('X-Request-Id', 'fuzzFooId')->once();
+
+			return $response;
+		};
+
+		$request = Mockery::mock(Request::class);
+		$headers = Mockery::mock(HeaderBag::class);
+		$request->headers = $headers;
+
+		$headers->shouldReceive('has')->with('X-Amzn-Trace-Id')->once()->andReturn(false);
+		$headers->shouldReceive('has')->with('X-Fz-Trace-Id')->once()->andReturn(true);
+		$request->shouldReceive('header')->with('X-Fz-Trace-Id')->once()->andReturn('fuzzFooId');
+
+		$middleware->handle($request, $closure);
+
+		$this->assertSame('fuzzFooId', RequestTracer::getRequestId());
+	}
+
+	public function testItSetUUIDIfNoTraceHeadersSet()
 	{
 		$middleware = new RequestTraceMiddleware;
 		$closure = function () {
@@ -57,6 +83,7 @@ class RequestTraceMiddlewareTest extends AppTestCase
 		$request->headers = $headers;
 
 		$headers->shouldReceive('has')->with('X-Amzn-Trace-Id')->once()->andReturn(false);
+		$headers->shouldReceive('has')->with('X-Fz-Trace-Id')->once()->andReturn(false);
 
 		$middleware->handle($request, $closure);
 

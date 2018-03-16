@@ -7,17 +7,10 @@ use Fuzz\ApiServer\RequestTrace\Facades\RequestTracer;
 use Fuzz\ApiServer\RequestTrace\RequestId;
 use Fuzz\ApiServer\Utility\UUID;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\HeaderBag;
 
 class RequestTraceMiddleware
 {
-	/**
-	 * Header names
-	 *
-	 * @const string
-	 */
-	const ELB_TRACE_ID      = 'X-Amzn-Trace-Id';
-	const REQUEST_ID_HEADER = 'X-Request-Id';
-
 	/**
 	 * Handle an incoming request.
 	 *
@@ -28,13 +21,7 @@ class RequestTraceMiddleware
 	 */
 	public function handle(Request $request, Closure $next)
 	{
-		$request_id = null;
-
-		if ($request->headers->has(self::ELB_TRACE_ID)) {
-			$request_id = $request->header(self::ELB_TRACE_ID);
-		} else {
-			$request_id = UUID::generate();
-		}
+		$request_id = $this->getRequestId($request);
 
 		app()->singleton(RequestTracer::class, function () use ($request_id) {
 			return new RequestId($request_id);
@@ -43,8 +30,33 @@ class RequestTraceMiddleware
 		/** @var \Symfony\Component\HttpFoundation\Response $response */
 		$response = $next($request);
 
-		$response->headers->set(self::REQUEST_ID_HEADER, $request_id);
+		$response->headers->set(RequestTracer::REQUEST_ID_HEADER, $request_id);
 
 		return $response;
+	}
+
+	/**
+	 * Find the Request ID or generat it
+	 *
+	 * @param \Illuminate\Http\Request $request
+	 *
+	 * @return string
+	 */
+	protected function getRequestId(Request $request): string
+	{
+		$request_id = null;
+		$headers = $request->headers;
+
+		// Is from ELB
+		if ($headers->has(RequestTracer::ELB_TRACE_ID)) {
+			$request_id = $request->header(RequestTracer::ELB_TRACE_ID);
+		} elseif ($headers->has(RequestTracer::FUZZ_TRACE_ID)) {
+			// Is from another Fuzz service
+			$request_id = $request->header(RequestTracer::FUZZ_TRACE_ID);
+		} else {
+			$request_id = UUID::generate();
+		}
+
+		return $request_id;
 	}
 }

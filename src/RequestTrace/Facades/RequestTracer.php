@@ -14,6 +14,15 @@ use Illuminate\Support\Facades\Facade;
 class RequestTracer extends Facade
 {
 	/**
+	 * Header names
+	 *
+	 * @const string
+	 */
+	const ELB_TRACE_ID      = 'X-Amzn-Trace-Id';
+	const FUZZ_TRACE_ID     = 'X-Fz-Trace-Id';
+	const REQUEST_ID_HEADER = 'X-Request-Id';
+
+	/**
 	 * Get the facade accessor
 	 *
 	 * @return string
