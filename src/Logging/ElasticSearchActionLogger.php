@@ -2,6 +2,7 @@
 
 namespace Fuzz\ApiServer\Logging;
 
+use Carbon\Carbon;
 use Elasticsearch\Client;
 use Fuzz\ApiServer\Utility\UUID;
 use Illuminate\Http\Request;
@@ -63,9 +64,12 @@ class ElasticSearchActionLogger extends BaseActionLogger
 			return false;
 		}
 
+		$now    = Carbon::now()->toIso8601String();
 		$events = $this->getMessageQueue();
 
 		foreach ($events as $event) {
+			$event['timestamp'] = $now;
+
 			$this->write($event);
 		}
 

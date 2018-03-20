@@ -117,7 +117,7 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 			'resource_id'  => (string) $resource_id,
 			'action'       => $action,
 			'ip'           => $this->client_ip,
-			'meta'         => json_encode($meta),
+			'meta'         => $meta,
 			'note'         => $note,
 			'error_status' => null,
 		];
@@ -158,7 +158,7 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 			'resource_id'  => (string) $resource_id,
 			'action'       => $action,
 			'ip'           => $this->client_ip,
-			'meta'         => json_encode($meta),
+			'meta'         => $meta,
 			'note'         => $note,
 			'error_status' => $error,
 		];

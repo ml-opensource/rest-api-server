@@ -55,7 +55,7 @@ class BaseActionLoggerTest extends AppTestCase
 			'resource_id'  => 'someResourceId',
 			'action'       => 'someAction',
 			'ip'           => '52.34.56.12',
-			'meta'         => json_encode(['foo' => 'bar']),
+			'meta'         => ['foo' => 'bar'],
 			'note'         => 'someNote',
 			'error_status' => null,
 			'request_id' => null
@@ -84,7 +84,7 @@ class BaseActionLoggerTest extends AppTestCase
 			'resource_id'  => 'someResourceId',
 			'action'       => 'someAction',
 			'ip'           => '52.34.56.12',
-			'meta'         => json_encode(['foo' => 'bar']),
+			'meta'         => ['foo' => 'bar'],
 			'note'         => 'someNote',
 			'error_status' => null,
 			'request_id' => null
@@ -113,7 +113,7 @@ class BaseActionLoggerTest extends AppTestCase
 			'resource_id'  => 'someResourceId',
 			'action'       => 'someAction',
 			'ip'           => '52.34.56.12',
-			'meta'         => json_encode(['foo' => 'bar']),
+			'meta'         => ['foo' => 'bar'],
 			'note'         => 'someNote',
 			'error_status' => null,
 			'request_id' => null
@@ -140,7 +140,7 @@ class BaseActionLoggerTest extends AppTestCase
 			'resource_id'  => 'someResourceId',
 			'action'       => 'someAction',
 			'ip'           => '52.34.56.12',
-			'meta'         => json_encode(['foo' => 'bar']),
+			'meta'         => ['foo' => 'bar'],
 			'note'         => 'someNote',
 			'error_status' => null,
 			'request_id' => null
@@ -171,7 +171,7 @@ class BaseActionLoggerTest extends AppTestCase
 			'resource_id'  => 'someResourceId',
 			'action'       => 'someAction',
 			'ip'           => '52.34.56.12',
-			'meta'         => json_encode(['foo' => 'bar']),
+			'meta'         => ['foo' => 'bar'],
 			'note'         => 'someNote',
 			'error_status' => null,
 			'request_id' => null
@@ -202,7 +202,7 @@ class BaseActionLoggerTest extends AppTestCase
 			'resource_id'  => 'someResourceId',
 			'action'       => 'someAction',
 			'ip'           => '52.34.56.12',
-			'meta'         => json_encode(['foo' => 'bar']),
+			'meta'         => ['foo' => 'bar'],
 			'note'         => 'someNote',
 			'error_status' => null,
 			'request_id' => null
@@ -242,7 +242,7 @@ class BaseActionLoggerTest extends AppTestCase
 			'resource_id'  => 'someResourceId',
 			'action'       => 'someAction',
 			'ip'           => '52.34.56.12',
-			'meta'         => json_encode(['foo' => 'bar']),
+			'meta'         => ['foo' => 'bar'],
 			'note'         => 'someNote',
 			'error_status' => null,
 			'request_id' => 'someRequestId',

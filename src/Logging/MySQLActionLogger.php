@@ -42,4 +42,22 @@ class MySQLActionLogger extends BaseActionLogger
 	{
 		return $this->config['mysql']['model_class'] ?? ActionLog::class;
 	}
+
+	/**
+	 * Get the message queue
+	 *
+	 * @return array
+	 */
+	public function getMessageQueue(): array
+	{
+		$this->loadRequestId();
+
+		// Apply the request ID retroactively, if it is set
+		return array_map(function (array $event) {
+			$event['meta']       = json_encode($event['meta']);
+			$event['request_id'] = $this->request_id;
+
+			return $event;
+		}, $this->message_queue);
+	}
 }

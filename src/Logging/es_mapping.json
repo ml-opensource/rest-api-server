@@ -1,0 +1,41 @@
+{
+	"mappings": {
+		"action_log": {
+			"properties": {
+				"timestamp": {
+					"type": "date"
+				},
+				"request_id": {
+					"type": "text"
+				},"user_id": {
+					"type": "text"
+				},
+				"client_id": {
+					"type": "text"
+				},
+				"resource": {
+					"type": "text"
+				},
+				"resource_id": {
+					"type": "text"
+				},
+				"action": {
+					"type": "text"
+				},
+				"ip": {
+					"type": "ip"
+				},
+				"meta": {
+					"dynamic": true,
+					"properties": {}
+				},
+				"note": {
+					"type": "text"
+				},
+				"error_status": {
+					"type": "text"
+				}
+			}
+		}
+	}
+}
