@@ -76,5 +76,5 @@ return [
 	|
 	*/
 
-	'prefix' => env('APP_NAME', 'koala_api'),
+	'prefix' => env('APP_NAME', 'foo_api'),
 ];
