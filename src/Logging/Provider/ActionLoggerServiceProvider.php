@@ -2,9 +2,8 @@
 
 namespace Fuzz\ApiServer\Logging\Provider;
 
+use Fuzz\ApiServer\Logging\ActionLogEngineManager;
 use Fuzz\ApiServer\Logging\Facades\ActionLogger;
-use Fuzz\ApiServer\Logging\MySQLActionLogger;
-use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 
 class ActionLoggerServiceProvider extends ServiceProvider
@@ -22,7 +21,7 @@ class ActionLoggerServiceProvider extends ServiceProvider
 		], 'config');
 
 		$this->publishes([
-			realpath(__DIR__ . '/../migrations') => database_path('/migrations')
+			realpath(__DIR__ . '/../migrations') => database_path('/migrations'),
 		], 'migrations');
 	}
 
@@ -33,8 +32,18 @@ class ActionLoggerServiceProvider extends ServiceProvider
 	 */
 	public function register()
 	{
-		$this->app->singleton(ActionLogger::class, function () {
-			return new MySQLActionLogger(config('action_log'), Request::instance());
+		$this->app->singleton(ActionLogEngineManager::class, function ($app) {
+			return new ActionLogEngineManager($app);
+		});
+
+		$this->app->singleton(ActionLogger::class, function ($app) {
+			// First, we will create the ActionLog manager which is responsible for the
+			// creation of the various action log drivers when they are needed by the
+			// application instance, and will resolve them on a lazy load basis.
+			/** @var ActionLogEngineManager $manager */
+			$manager = $app[ActionLogEngineManager::class];
+
+			return $manager->driver(config('action_log.driver'));
 		});
 	}
 }

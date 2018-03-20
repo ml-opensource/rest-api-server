@@ -58,18 +58,18 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 	protected $client_id;
 
 	/**
-	 * The model for action logs
-	 *
-	 * @var string
-	 */
-	protected $log_model;
-
-	/**
 	 * Request ID storage
 	 *
 	 * @var string|null
 	 */
 	protected $request_id;
+
+	/**
+	 * Config storage
+	 *
+	 * @var array
+	 */
+	protected $config;
 
 	/**
 	 * ActionLogLogger constructor.
@@ -81,7 +81,7 @@ abstract class BaseActionLogger implements ActionLoggerInterface
 	{
 		$this->request         = $request;
 		$this->client_ip       = $request->ip();
-		$this->log_model       = $config['model_class'] ?? ActionLog::class;
+		$this->config = $config;
 		$this->logging_enabled = $config['enabled'];
 	}
 

@@ -61,7 +61,12 @@ class MySQLActionLoggerTest extends AppTestCase
 		$request_mock->shouldReceive('ip')->once()->andReturn('127.0.0.1');
 
 		$config = [
+			'driver' => 'mysql',
 			'enabled' => true,
+
+			'mysql' => [
+				'model_class' => \Fuzz\ApiServer\Logging\ActionLog::class,
+			],
 		];
 
 		$logger = new MySQLActionLogger($config, $request_mock);
@@ -122,8 +127,12 @@ class MySQLActionLoggerTest extends AppTestCase
 		$request_mock->shouldReceive('ip')->once()->andReturn('127.0.0.1');
 
 		$config = [
+			'driver' => 'mysql',
 			'enabled' => true,
-			'model_class' => SomeOtherLoggingModel::class,
+
+			'mysql' => [
+				'model_class' => SomeOtherLoggingModel::class,
+			],
 		];
 
 		Schema::create('some_logging_table', function (Blueprint $table) {
@@ -202,7 +211,12 @@ class MySQLActionLoggerTest extends AppTestCase
 		$request_mock->shouldReceive('ip')->once()->andReturn('127.0.0.1');
 
 		$config = [
+			'driver' => 'mysql',
 			'enabled' => true,
+
+			'mysql' => [
+				'model_class' => \Fuzz\ApiServer\Logging\ActionLog::class,
+			],
 		];
 
 		$logger = new MySQLActionLogger($config, $request_mock);

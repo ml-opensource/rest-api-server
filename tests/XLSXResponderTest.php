@@ -38,7 +38,7 @@ class XLSXResponderTest extends AppTestCase
     public function testItCanSetData()
     {
         $responder = new XLSXResponder();
-        $responder->setData(['key' => 'data']);
+        $responder->setData(['key' => ['data']]);
 
         $this->assertSame(XLSXResponder::CONTENT_TYPE, $responder->getResponse()->headers->get('Content-Type'));
         $this->assertSame('attachment; filename="export.xlsx"', $responder->getResponse()->headers->get('Content-Disposition'));

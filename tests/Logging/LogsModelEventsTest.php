@@ -46,7 +46,12 @@ class LogsModelEventsTest extends AppTestCase
 		);
 
 		$app['config']->set('action_log', [
+			'driver' => 'mysql',
 			'enabled' => true,
+
+			'mysql' => [
+				'model_class' => \Fuzz\ApiServer\Logging\ActionLog::class,
+			],
 		]);
 	}
 

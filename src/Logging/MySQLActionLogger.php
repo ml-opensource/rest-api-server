@@ -22,7 +22,7 @@ class MySQLActionLogger extends BaseActionLogger
 			return false;
 		}
 
-		$log_model = $this->log_model;
+		$log_model = $this->getModelClass();
 
 		$success = $log_model::insert($this->getMessageQueue());
 
@@ -31,5 +31,15 @@ class MySQLActionLogger extends BaseActionLogger
 		}
 
 		return $success;
+	}
+
+	/**
+	 * Resolve the model class
+	 *
+	 * @return string
+	 */
+	public function getModelClass(): string
+	{
+		return $this->config['mysql']['model_class'] ?? ActionLog::class;
 	}
 }
