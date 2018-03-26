@@ -6,6 +6,7 @@ use Fuzz\ApiServer\Logging\ActionLog;
 use Fuzz\ApiServer\Logging\Contracts\ActionLogModel;
 use Fuzz\ApiServer\Logging\MySQLActionLogger;
 use Fuzz\ApiServer\Tests\AppTestCase;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
@@ -25,12 +26,7 @@ class MySQLActionLoggerTest extends AppTestCase
 
 		$this->artisan = $this->app->make('Illuminate\Contracts\Console\Kernel');
 
-		$this->artisan->call(
-			'migrate:refresh', [
-				'--database' => 'testbench',
-				'--realpath'     => realpath(__DIR__ . '/../../src/Logging/migrations'),
-			]
-		);
+		$this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
 
 		Schema::create('users', function (Blueprint $table) {
 			$table->increments('id');

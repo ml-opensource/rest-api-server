@@ -11,29 +11,14 @@ class CompositeFailedResponseTest extends AppTestCase
 	{
 		$response = new FailedResponse('some_reason');
 
-		try {
-			$response->setContent('foo');
+		$this->expectException(\LogicException::class);
+		$response->setContent('foo');
 
-			$this->fail('should throw.');
-		} catch (\LogicException $exception) {
-			// pass
-		}
+		$this->expectException(\LogicException::class);
+		$response->setStatusCode(200);
 
-		try {
-			$response->setStatusCode(200);
-
-			$this->fail('should throw.');
-		} catch (\LogicException $exception) {
-			// pass
-		}
-
-		try {
-			$response->setHeaders(['foo']);
-
-			$this->fail('should throw.');
-		} catch (\LogicException $exception) {
-			// pass
-		}
+		$this->expectException(\LogicException::class);
+		$response->setHeaders(['foo']);
 	}
 
 	public function testItSerializesErrorResponse()

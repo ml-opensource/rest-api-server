@@ -3,9 +3,9 @@
 namespace Fuzz\ApiServer\Tests;
 
 use Mockery;
-use PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase as BaseTestCase;
 
-abstract class TestCase extends PHPUnit_Framework_TestCase
+abstract class TestCase extends BaseTestCase
 {
 	/**
 	 * Tear down tests
