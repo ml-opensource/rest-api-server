@@ -5,8 +5,8 @@ namespace Fuzz\ApiServer\Notifier\Handlers\Jira;
 use Carbon\Carbon;
 use Fuzz\ApiServer\Notifier\BaseNotifier;
 use Fuzz\ApiServer\Notifier\Contracts\Notifier;
-use Fuzz\ApiServer\Notifier\Facades\Notifier as GlobalNotifier;
 use Fuzz\ApiServer\Notifier\Traits\ReadsRequestId;
+use Illuminate\Support\Facades\Log;
 use JiraRestApi\Configuration\ArrayConfiguration;
 use JiraRestApi\Issue\IssueField;
 use JiraRestApi\Issue\IssueService;
@@ -25,9 +25,9 @@ class JiraHandler extends BaseNotifier implements Notifier
 	private $app_name;
 
 	/**
-	 * @var string
+	 * @var array
 	 */
-	private $component;
+	private $components;
 
 	/**
 	 * @var string
@@ -70,8 +70,8 @@ class JiraHandler extends BaseNotifier implements Notifier
 	{
 		parent::__construct($config);
 
-		$this->app_name  = config('app.name');
-		$this->component = $config['component'];
+		$this->app_name   = config('app.name');
+		$this->components = $config['components'];
 	}
 
 	/**
@@ -97,7 +97,7 @@ class JiraHandler extends BaseNotifier implements Notifier
 		}
 
 		$this->environment = $environment;
-		$this->error_class = get_class($e);
+		$this->error_class = class_basename(get_class($e));
 		$this->error_file  = basename($e->getFile());
 		$this->line_number = $e->getLine();
 		$this->issues      = $this->issueClient();
@@ -163,7 +163,7 @@ BODY;
 		$file       = $this->error_file;
 		$line       = $this->line_number;
 
-		return "[$this->component][REQ-REVIEW] $error_name in $this->app_name in $file on line $line on $this->environment.";
+		return "[REQ-REVIEW] $error_name in $this->app_name in $file on line $line on $this->environment.";
 	}
 
 	/**
@@ -188,9 +188,7 @@ BODY;
 		try {
 			$result = $this->issues->search($query->getQuery());
 		} catch (JiraException|JsonMapper_Exception $exception) {
-			GlobalNotifier::notifyError($exception, self::MINOR, [
-				'issue_name' => $name,
-			]);
+			Log::error($exception->getMessage());
 
 			return true;
 		}
@@ -208,11 +206,11 @@ BODY;
 		$issue_field = new IssueField;
 
 		$issue_field->setProjectKey($this->config['project_key'])->setSummary($name)
-					->setPriorityName($this->config['error']['priority'])
+					->setPriorityName($this->config['errors']['priority'])
 					->setIssueType($this->config['errors']['issue_type'])->setDescription($this->context)
-					->addComponents($this->config['components']);
+					->addComponents($this->components);
 
-		foreach ($this->config['error']['labels'] as $error_label) {
+		foreach ($this->config['errors']['labels'] as $error_label) {
 			$issue_field->addLabel($error_label);
 		}
 
@@ -223,7 +221,7 @@ BODY;
 		try {
 			$result = $this->issues->create($issue_field);
 		} catch (JiraException|JsonMapper_Exception $exception) {
-			GlobalNotifier::notifyError($exception, self::MINOR, [
+			Log::error($exception->getMessage(), [
 				'issue_name' => $name,
 			]);
 		}
