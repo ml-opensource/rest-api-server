@@ -2,6 +2,7 @@
 
 namespace Fuzz\ApiServer\Notifier\Facades;
 
+use Fuzz\ApiServer\Notifier\Contracts\Notifier as INotifier;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -14,6 +15,15 @@ use Illuminate\Support\Facades\Facade;
  */
 class Notifier extends Facade
 {
+	/**
+	 * Severity levels
+	 *
+	 * @const string
+	 */
+	const MINOR  = INotifier::MINOR;
+	const URGENT = INotifier::URGENT;
+	const SEVERE = INotifier::SEVERE;
+
 	/**
 	 * Get the facade accessor
 	 *
