@@ -120,7 +120,7 @@ Environment: $this->environment
 Hostname: $hostname
 OS: $os
 Severity: $severity
-Request/b>: $request_id
+Request: $request_id
 
 Occurred UTC): $now_utc
 Occurred EST): $now_est
