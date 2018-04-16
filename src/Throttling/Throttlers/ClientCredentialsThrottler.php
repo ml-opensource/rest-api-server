@@ -7,7 +7,7 @@ use Fuzz\ApiServer\Throttling\ThrottleTypes\FixedWindowThrottler;
 /**
  * Class ClientCredentialsThrottler
  *
- * Throttle by a store location ID
+ * Throttle by client ID
  *
  * @package Fuzz\ApiServer\Throttling
  */
