@@ -3,3 +3,5 @@ php:
   - '7.2'
 install:
   - composer install
+services:
+  - redis-server
