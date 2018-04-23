@@ -35,15 +35,6 @@ use Symfony\Component\HttpFoundation\Response;
 class CacheDirectiveEntityCache extends EntityCache
 {
 	/**
-	 * Cache headers
-	 *
-	 * @const string
-	 */
-	// @todo handle setting hit/miss header
-	const CACHE_HIT  = 'Hit';
-	const CACHE_MISS = 'Miss';
-
-	/**
 	 * Header name for response cache
 	 *
 	 * @const string
