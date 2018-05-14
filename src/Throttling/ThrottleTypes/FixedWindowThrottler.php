@@ -89,7 +89,7 @@ abstract class FixedWindowThrottler implements Throttler
 	 */
 	protected function makeKey(string $key): string
 	{
-		return sprintf("%s:%s:%s", self::KEY_PREFIX, $this->getThrottleType(), $key);
+		return sprintf("%s:%s:%s", static::KEY_PREFIX, $this->getThrottleType(), $key);
 	}
 
 	/**
@@ -99,7 +99,7 @@ abstract class FixedWindowThrottler implements Throttler
 	 */
 	public function getThrottleType(): string
 	{
-		return self::THROTTLE_TYPE;
+		return static::THROTTLE_TYPE;
 	}
 
 	/**
@@ -118,7 +118,7 @@ abstract class FixedWindowThrottler implements Throttler
 
 		if ($throttler->isAtLimit()) {
 			$headers = $throttler->getHeaders($throttler->getMaxAttempts(), $throttler->getAttemptsLeft(), $throttler->getDecaySeconds());
-			throw new TooManyRequestsHttpException($throttler->getDecaySeconds(), 'Too Many Requests.', [], self::ERROR_KEY, self::ERROR_KEY, $headers);
+			throw new TooManyRequestsHttpException($throttler->getDecaySeconds(), 'Too Many Requests.', [], static::ERROR_KEY, static::ERROR_KEY, $headers);
 		}
 
 		return $throttler->getHeaders($throttler->getMaxAttempts(), $throttler->getAttemptsLeft());
