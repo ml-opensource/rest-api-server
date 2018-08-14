@@ -45,7 +45,7 @@ class GenSeederCommand extends SeederMakeCommand
 	 *
 	 * @return void
 	 */
-	public function fire()
+	public function handle()
 	{
 		$this->baseFire();
 

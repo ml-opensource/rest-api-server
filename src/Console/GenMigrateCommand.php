@@ -57,7 +57,7 @@ class GenMigrateCommand extends GeneratorCommand
 	 *
 	 * @return bool|null
 	 */
-	public function fire()
+	public function handle()
 	{
 		$this->ensureMigrationDoesntAlreadyExist();
 

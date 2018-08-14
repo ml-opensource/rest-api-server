@@ -59,7 +59,7 @@ class GenModelCommand extends ModelMakeCommand
 		$this->info($this->type.' created successfully.');
 	}
 
-	public function fire()
+	public function handle()
 	{
 		$this->baseFire();
 
