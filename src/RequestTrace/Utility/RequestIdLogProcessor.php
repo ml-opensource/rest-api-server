@@ -5,7 +5,7 @@ namespace Fuzz\ApiServer\RequestTrace\Utility;
 /**
  * Class RequestIdLogProcessor
  *
- * Handles Monolog proceessing for attaching RequestId to a log line.
+ * Handles Monolog processing for attaching RequestId to a log line.
  *
  * @package Fuzz\ApiServer\RequestTrace\Utility
  */
@@ -35,7 +35,8 @@ class RequestIdLogProcessor
 	 */
 	public function __invoke(array $record): array
 	{
-		$record['message'] = "[X-Request-Id: $this->request_id] {$record['message']}";
+		$record['message']    = "[X-Request-Id: $this->request_id] {$record['message']}";
+		$record['request_id'] = $this->request_id;
 
 		return $record;
 	}
