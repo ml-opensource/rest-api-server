@@ -27,7 +27,7 @@ class MonologProcessorsMiddleware
 	 */
 	public function handle(Request $request, Closure $next)
 	{
-		$monolog = Log::getMonolog();
+		$monolog = Log::getLogger();
 
 		$monolog->pushProcessor(new RequestIdLogProcessor(RequestTracer::getRequestId()));
 
