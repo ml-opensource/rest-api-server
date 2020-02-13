@@ -96,8 +96,8 @@ BODY;
 		}
 
 		Mail::to($this->config['receivers'])->queue(new NotificationEmail($subject, $body, $env, $now_utc));
-
-		Cache::put($this->makeCacheKey($error, $message), true, $this->config['notification_cooldown_min']);
+		
+		Cache::put($this->makeCacheKey($error, $message), true, $this->config['notification_cooldown_min'] * 60);
 
 		return true;
 	}

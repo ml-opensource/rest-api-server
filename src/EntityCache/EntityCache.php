@@ -74,7 +74,7 @@ class EntityCache
 	{
 		$this->cached_response_serialized = serialize($entity);
 
-		Cache::put($this->cache_key, $this->cached_response_serialized, $cache_ttl_min);
+		Cache::put($this->cache_key, $this->cached_response_serialized, $cache_ttl_min * 60);
 	}
 
 	/**
