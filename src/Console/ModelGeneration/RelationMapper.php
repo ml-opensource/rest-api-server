@@ -9,6 +9,7 @@ use Doctrine\DBAL\Schema\Table;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -277,7 +278,7 @@ class RelationMapper
 		if (count($table->getForeignKeys()) > 1) {
 
 			// If this table is not mapped to a model, then we assume it's a many to many table.
-			if (! array_has($this->tableMap, $table->getName())) {
+			if (! Arr::hash($this->tableMap, $table->getName())) {
 				return true;
 			}
 

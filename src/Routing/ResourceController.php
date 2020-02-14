@@ -5,6 +5,7 @@ namespace Fuzz\ApiServer\Routing;
 use Fuzz\Data\Traits\Transformations;
 use Fuzz\Data\Transformations\Serialization\DefaultArrayTransformer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Fuzz\MagicBox\Contracts\Repository;
 use Fuzz\Auth\Policies\ChecksGatePolicies;
 use Fuzz\MagicBox\Utility\ChecksRelations;
@@ -258,7 +259,7 @@ class ResourceController extends Controller
 		if (isset($input[$key_name])) {
 			$related = $related_model_class::findOrFail($input[$key_name]);
 			if (! $policy->updateNested($repository, $related, $parent, $input)) {
-				$input = array_only($input, [$key_name]);
+				$input = Arr::only($input, [$key_name]);
 			}
 		} elseif (! $policy->storeNested($repository, $related, $parent, $input)) {
 			throw new AccessDeniedHttpException;

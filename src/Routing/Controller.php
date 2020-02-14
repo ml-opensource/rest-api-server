@@ -13,8 +13,8 @@ use Fuzz\HttpException\BadRequestHttpException;
 use Fuzz\HttpException\ConflictHttpException;
 use Fuzz\HttpException\NotFoundHttpException;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Arr;
 use Illuminate\Routing\Controller as RoutingBaseController;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -73,7 +73,7 @@ abstract class Controller extends RoutingBaseController
      */
     public static function getPerPage($default = self::PAGINATION_PER_PAGE_DEFAULT): int
     {
-        return min((int)Input::get(static::PAGINATION_PER_PAGE, $default), self::PAGINATION_PER_PAGE_MAXIMUM);
+        return min((int)Request::get(static::PAGINATION_PER_PAGE, $default), self::PAGINATION_PER_PAGE_MAXIMUM);
     }
 
     /**
@@ -226,7 +226,7 @@ abstract class Controller extends RoutingBaseController
     {
         // Pass in any additional query variables
         foreach (
-            array_except(Request::instance()->query->all(), [
+            Arr::except(Request::instance()->query->all(), [
                 self::PAGINATION_CURRENT_PAGE,
                 self::PAGINATION_PER_PAGE,
             ]) as $key => $value
@@ -287,11 +287,11 @@ abstract class Controller extends RoutingBaseController
         $missing_required = [];
 
         foreach (func_get_args() as $parameter_name) {
-            if (! Input::has($parameter_name)) {
+            if (! Request::has($parameter_name)) {
                 $missing_required[] = $parameter_name;
             }
 
-            $passed_parameters[] = Input::get($parameter_name);
+            $passed_parameters[] = Request::get($parameter_name);
         }
 
         if (count($missing_required) !== 0) {
@@ -323,7 +323,7 @@ abstract class Controller extends RoutingBaseController
         $passed_parameters = [];
 
         foreach (func_get_args() as $parameter_name) {
-            $passed_parameters[] = Input::get($parameter_name, null);
+            $passed_parameters[] = Request::get($parameter_name, null);
         }
 
         return $passed_parameters;
@@ -338,6 +338,6 @@ abstract class Controller extends RoutingBaseController
      */
     protected function readArrayParameter($parameter_name)
     {
-        return array_values(array_filter((array)Input::get($parameter_name)));
+        return array_values(array_filter((array)Request::get($parameter_name)));
     }
 }
