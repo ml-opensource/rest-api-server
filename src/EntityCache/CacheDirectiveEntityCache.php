@@ -88,16 +88,16 @@ class CacheDirectiveEntityCache extends EntityCache
 	 * Store the entity in the cache
 	 *
 	 * @param mixed $entity
-	 * @param int   $cache_ttl_min
+	 * @param int   $cache_ttl_seconds
 	 */
-	public function store($entity, int $cache_ttl_min = 5)
+	public function store($entity, int $cache_ttl_seconds = 300)
 	{
 		// Don't store when no-store
 		if (! $this->canStore()) {
 			return;
 		}
 
-		parent::store($entity, $cache_ttl_min);
+		parent::store($entity, $cache_ttl_seconds);
 	}
 
 	/**

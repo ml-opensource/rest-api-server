@@ -68,13 +68,13 @@ class EntityCache
 	 * Store the entity in the cache
 	 *
 	 * @param mixed $entity
-	 * @param int   $cache_ttl_min
+	 * @param int   $cache_ttl_seconds
 	 */
-	public function store($entity, int $cache_ttl_min = 5)
+	public function store($entity, int $cache_ttl_seconds = 300)
 	{
 		$this->cached_response_serialized = serialize($entity);
 
-		Cache::put($this->cache_key, $this->cached_response_serialized, $cache_ttl_min * 60);
+		Cache::put($this->cache_key, $this->cached_response_serialized, $cache_ttl_seconds);
 	}
 
 	/**
