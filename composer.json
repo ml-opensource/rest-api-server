@@ -22,7 +22,7 @@
 		"guzzlehttp/guzzle": "~6.0",
 		"elasticsearch/elasticsearch": "~5.0",
 		"jsq/amazon-es-php": "^0.2.0",
-		"lesstif/php-jira-rest-client": "dev-master"
+		"lesstif/php-jira-rest-client": "dev-main"
 	},
 	"require-dev": {
 		"mockery/mockery": "0.9.*",
