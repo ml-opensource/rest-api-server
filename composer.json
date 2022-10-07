@@ -22,7 +22,7 @@
 		"guzzlehttp/guzzle": "~6.0",
 		"elasticsearch/elasticsearch": "~5.0",
 		"jsq/amazon-es-php": "^0.2.0",
-		"lesstif/php-jira-rest-client": "dev-main"
+		"lesstif/php-jira-rest-client": "^1.19.8"
 	},
 	"require-dev": {
 		"mockery/mockery": "0.9.*",
@@ -31,6 +31,16 @@
 		"orchestra/database": "3.5.*",
 		"doctrine/dbal": "^2.5",
 		"scriptfusion/phpunit-immediate-exception-printer": "^1"
+	},
+	"repositories": {
+		"lucadegasperi/oauth2-server-laravel": {
+			"type": "vcs",
+			"url": "https://github.com/fuzz-productions/oauth2-server-laravel"
+		},
+		"fuzz/magic-box": {
+			"type": "vcs",
+			"url": "https://github.com/fuzz-productions/magic-box.git"
+		}
 	},
 	"autoload": {
 		"psr-4": {
