@@ -27,7 +27,12 @@ class MonologProcessorsMiddleware
 	 */
 	public function handle(Request $request, Closure $next)
 	{
-		$monolog = Log::getLogger();
+        // Workaround for change in Illuminate\Log\Writer between Laravel 5.5 and 5.6
+        if (version_compare(app()->version(), '5.6', '<')) {
+            $monolog = Log::getMonolog();
+        } else {
+            $monolog = Log::getLogger();
+        }
 
 		$monolog->pushProcessor(new RequestIdLogProcessor(RequestTracer::getRequestId()));
 
